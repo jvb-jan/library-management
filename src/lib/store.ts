@@ -61,6 +61,10 @@ export const setBooks = (books: Book[]) => {
   global.__db_books = books;
 };
 
+export const setUsers = (users: User[]) => {
+  global.__db_users = users;
+};
+
 export const getStats = (): DashboardStats => {
   const books = getBooks();
   const users = getUsers();
