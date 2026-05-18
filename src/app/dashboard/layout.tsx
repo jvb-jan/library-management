@@ -1,5 +1,6 @@
 import { getSession } from '@/app/actions/auth';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Navbar } from '@/components/layout/Navbar';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardLayout({
@@ -13,13 +14,16 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex bg-background min-h-screen">
+    <div className="flex bg-[#070708] min-h-screen text-slate-100">
       <Sidebar user={user} />
-      <main className="flex-1 p-8 overflow-y-auto">
-        <div className="max-w-7xl mx-auto">
-          {children}
-        </div>
-      </main>
+      <div className="flex-1 flex flex-col min-h-screen">
+        <Navbar user={user} />
+        <main className="flex-1 p-8 overflow-y-auto">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
+      </div>
     </div>
   );
 }

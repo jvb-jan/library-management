@@ -21,6 +21,15 @@ export interface Book {
   createdAt: string;
 }
 
+export interface ActivityLog {
+  id: string;
+  userId: string;
+  username: string;
+  action: string;
+  type: 'BOOK' | 'USER' | 'SYSTEM';
+  timestamp: string;
+}
+
 export interface DashboardStats {
   totalBooks: number;
   totalUsers: number;
