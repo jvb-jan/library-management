@@ -112,7 +112,7 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
                     </div>
                     <div>
                       <p className="text-sm font-semibold">{log.action}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{new Date(log.timestamp).toLocaleString()}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{new Date(log.timestamp).toLocaleDateString()}</p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[10px] uppercase tracking-widest">Update</Badge>

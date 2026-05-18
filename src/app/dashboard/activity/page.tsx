@@ -32,7 +32,7 @@ export default async function ActivityPage() {
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-b border-white/5 hover:bg-transparent">
-              <TableHead>Timestamp</TableHead>
+              <TableHead>Date</TableHead>
               <TableHead>Actor</TableHead>
               <TableHead>Action Event</TableHead>
               <TableHead>Module</TableHead>
@@ -51,7 +51,7 @@ export default async function ActivityPage() {
                   <TableCell className="text-xs font-mono text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3" />
-                      {new Date(log.timestamp).toLocaleString()}
+                      {new Date(log.timestamp).toLocaleDateString()}
                     </div>
                   </TableCell>
                   <TableCell>
