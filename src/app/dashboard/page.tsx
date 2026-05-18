@@ -1,21 +1,17 @@
 import { getStats } from '@/lib/store';
 import { getSession } from '@/app/actions/auth';
 import { StatCard } from '@/components/dashboard/StatCard';
+import { InventoryChart } from '@/components/dashboard/InventoryChart';
 import { 
   BookCopy, 
   Users, 
   UserRound, 
   CheckCircle2, 
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  Database
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { 
-  ChartContainer, 
-  ChartTooltip, 
-  ChartTooltipContent 
-} from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, ResponsiveContainer } from 'recharts';
 
 export default async function DashboardPage() {
   const stats = getStats();
@@ -77,14 +73,8 @@ export default async function DashboardPage() {
             </CardTitle>
             <CardDescription>Live breakdown of current book statuses in the vault.</CardDescription>
           </CardHeader>
-          <CardContent className="h-[300px] w-full pt-6">
-             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" stroke="#888888" fontSize={12} tickLine={false} axisLine={false} />
-                  <Bar dataKey="value" radius={[4, 4, 0, 0]} />
-                  <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-                </BarChart>
-             </ResponsiveContainer>
+          <CardContent>
+            <InventoryChart data={chartData} />
           </CardContent>
         </Card>
 
@@ -107,5 +97,3 @@ export default async function DashboardPage() {
     </div>
   );
 }
-
-import { Database } from 'lucide-react';
