@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { BookList } from '@/components/books/BookList';
 import { BookForm } from '@/components/books/BookForm';
 import { 
@@ -11,7 +12,7 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus, BookOpenCheck, Bookmark, Library } from 'lucide-react';
+import { Plus, BookOpenCheck, Bookmark, Library, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   createBook, 
@@ -20,31 +21,38 @@ import {
 } from '@/app/actions/books';
 import { toggleReadingList } from '@/app/actions/user';
 import { getBooks, getUsers } from '@/lib/store';
-import { Book, Role, User } from '@/lib/types';
+import { Book, User } from '@/lib/types';
 import { getSession } from '@/app/actions/auth';
 import { hasPermission } from '@/lib/auth';
 
 export default function BooksPage() {
   const { toast } = useToast();
+  const searchParams = useSearchParams();
   const [books, setBooks] = useState<Book[]>([]);
   const [user, setUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | undefined>();
   const [isLoading, setIsLoading] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
     async function loadData() {
       const session = await getSession();
       if (session) {
-        // Fetch full user data to get reading list
         const users = getUsers();
         const fullUser = users.find(u => u.id === session.id);
         if (fullUser) setUser(fullUser);
       }
       setBooks(getBooks());
+      setIsDataLoaded(true);
+
+      // Handle direct "Add Book" navigation from sidebar
+      if (searchParams.get('action') === 'add') {
+        setIsDialogOpen(true);
+      }
     }
     loadData();
-  }, []);
+  }, [searchParams]);
 
   const handleAdd = () => {
     setEditingBook(undefined);
@@ -57,13 +65,13 @@ export default function BooksPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm('Are you sure you want to delete this book?')) {
+    if (confirm('Are you sure you want to delete this nexus entry?')) {
       try {
         await deleteBook(id);
         setBooks(getBooks());
-        toast({ title: 'Book deleted successfully' });
+        toast({ title: 'Record Purged', description: 'The entry has been removed from the central archive.' });
       } catch (e) {
-        toast({ title: 'Error', description: 'Failed to delete book', variant: 'destructive' });
+        toast({ title: 'Purge Failed', description: 'Unauthorized or system error encountered.', variant: 'destructive' });
       }
     }
   };
@@ -73,15 +81,15 @@ export default function BooksPage() {
     try {
       if (editingBook) {
         await updateBook(editingBook.id, data);
-        toast({ title: 'Book updated successfully' });
+        toast({ title: 'Record Synchronized', description: 'Book data has been updated in the index.' });
       } else {
         await createBook(data);
-        toast({ title: 'Book created successfully' });
+        toast({ title: 'Index Entry Created', description: 'New book added to the repository.' });
       }
       setBooks(getBooks());
       setIsDialogOpen(false);
     } catch (e) {
-      toast({ title: 'Error', description: 'Action failed', variant: 'destructive' });
+      toast({ title: 'Operation Failed', description: 'Unauthorized or validation error.', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -95,13 +103,21 @@ export default function BooksPage() {
       if (updatedUser) setUser({...updatedUser});
       
       toast({ 
-        title: result.isInList ? 'Added to Reading List' : 'Removed from Reading List',
-        description: 'Your personal inventory has been updated.'
+        title: result.isInList ? 'Nexus Linked' : 'Link Severed',
+        description: result.isInList ? 'Added to your reading list.' : 'Removed from your reading list.'
       });
     } catch (e) {
-      toast({ title: 'Error', description: 'Failed to update reading list', variant: 'destructive' });
+      toast({ title: 'Link Failed', description: 'Could not update your personal list.', variant: 'destructive' });
     }
   };
+
+  if (!isDataLoaded) {
+    return (
+      <div className="h-[60vh] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   const readingListBooks = books.filter(b => user?.readingList?.includes(b.id));
 
@@ -109,11 +125,11 @@ export default function BooksPage() {
     <div className="space-y-8 animate-in-fade">
       <div className="flex justify-between items-center">
         <div className="flex flex-col gap-1">
-          <h1 className="text-4xl font-headline font-bold">Catalog Archive</h1>
-          <p className="text-muted-foreground">Browse the central repository and manage your personal reading list.</p>
+          <h1 className="text-4xl font-headline font-bold text-white">Catalog Archive</h1>
+          <p className="text-muted-foreground">Manage the central repository and curate your personal collection.</p>
         </div>
-        {hasPermission(user?.role || 'USER', 'CREATE') && (
-          <Button onClick={handleAdd} className="rounded-xl px-6 h-12 shadow-lg shadow-primary/20 gap-2">
+        {user && hasPermission(user.role, 'CREATE') && (
+          <Button onClick={handleAdd} className="rounded-xl px-6 h-12 shadow-lg shadow-primary/20 gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold">
             <Plus className="w-5 h-5" />
             Add New Book
           </Button>
@@ -124,7 +140,7 @@ export default function BooksPage() {
         <div className={user?.role === 'USER' ? "lg:col-span-8 space-y-4" : "space-y-4"}>
           <div className="flex items-center gap-2 mb-2 px-2">
             <Library className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Global Catalog</h2>
+            <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Nexus Catalog</h2>
           </div>
           <BookList 
             books={books} 
@@ -150,18 +166,18 @@ export default function BooksPage() {
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm font-semibold">Your list is empty</p>
-                    <p className="text-xs text-muted-foreground">Bookmark books from the catalog to track them here.</p>
+                    <p className="text-xs text-muted-foreground">Bookmark entries to track them here.</p>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {readingListBooks.map(book => (
                     <div key={book.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group">
-                      <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground shrink-0">
+                      <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground shrink-0 overflow-hidden">
                         <Bookmark className="w-4 h-4 opacity-40 group-hover:text-secondary transition-colors" />
                       </div>
                       <div className="flex-1 overflow-hidden">
-                        <p className="text-sm font-bold truncate">{book.title}</p>
+                        <p className="text-sm font-bold truncate text-slate-100">{book.title}</p>
                         <p className="text-xs text-muted-foreground truncate">{book.author}</p>
                       </div>
                       <Button 
@@ -182,13 +198,13 @@ export default function BooksPage() {
       </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="glass border-white/10 sm:max-w-[600px]">
+        <DialogContent className="glass border-white/10 sm:max-w-[600px] text-slate-100">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-headline">
-              {editingBook ? 'Refine Book Data' : 'New Catalog Entry'}
+            <DialogTitle className="text-2xl font-headline text-white">
+              {editingBook ? 'Refine Entry' : 'New Archive Entry'}
             </DialogTitle>
-            <DialogDescription>
-              {editingBook ? 'Modify the properties of this existing nexus entry.' : 'Initialize a new entry in the BiblioFlow central repository.'}
+            <DialogDescription className="text-slate-400">
+              {editingBook ? 'Update the metadata for this catalog object.' : 'Initialize a new entry in the BiblioFlow central repository.'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
