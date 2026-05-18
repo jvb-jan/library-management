@@ -20,10 +20,12 @@ export function decodeToken(token: string): User | null {
 export function hasPermission(userRole: Role, action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE'): boolean {
   if (userRole === 'ADMIN') return true;
   if (userRole === 'LIBRARIAN') {
-    return ['READ', 'UPDATE', 'CREATE'].includes(action); // Librarians can also create now
+    // Librarians can manage the catalog but not delete users or sensitive data
+    return ['READ', 'UPDATE', 'CREATE'].includes(action);
   }
   if (userRole === 'USER') {
-    return ['READ', 'CREATE'].includes(action); // Standard users can READ and CREATE entries
+    // Standard users can only browse the catalog
+    return ['READ'].includes(action);
   }
   return false;
 }
