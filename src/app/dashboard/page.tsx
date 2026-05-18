@@ -10,13 +10,7 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import dynamic from 'next/dynamic';
-
-// Import InventoryChart with SSR disabled to prevent Recharts/hydration errors
-const InventoryChart = dynamic(() => import('@/components/dashboard/InventoryChart').then(mod => mod.InventoryChart), { 
-  ssr: false,
-  loading: () => <div className="h-[300px] w-full bg-muted/10 animate-pulse rounded-xl flex items-center justify-center text-xs text-muted-foreground uppercase tracking-widest">Loading Analytics...</div>
-});
+import { InventoryChartWrapper } from '@/components/dashboard/InventoryChartWrapper';
 
 export default async function DashboardPage() {
   const stats = getStats();
@@ -79,7 +73,7 @@ export default async function DashboardPage() {
             <CardDescription>Live breakdown of current book statuses in the vault.</CardDescription>
           </CardHeader>
           <CardContent>
-            <InventoryChart data={chartData} />
+            <InventoryChartWrapper data={chartData} />
           </CardContent>
         </Card>
       </div>
