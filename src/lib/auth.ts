@@ -20,10 +20,10 @@ export function decodeToken(token: string): User | null {
 export function hasPermission(userRole: Role, action: 'CREATE' | 'READ' | 'UPDATE' | 'DELETE'): boolean {
   if (userRole === 'ADMIN') return true;
   if (userRole === 'LIBRARIAN') {
-    return ['READ', 'UPDATE'].includes(action);
+    return ['READ', 'UPDATE', 'CREATE'].includes(action); // Librarians can also create now
   }
   if (userRole === 'USER') {
-    return action === 'READ';
+    return ['READ', 'CREATE'].includes(action); // Standard users can READ and CREATE entries
   }
   return false;
 }
