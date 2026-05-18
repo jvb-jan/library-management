@@ -11,31 +11,36 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus, Library } from 'lucide-react';
+import { Plus, BookOpenCheck, Bookmark, Library } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   createBook, 
   updateBook, 
   deleteBook 
 } from '@/app/actions/books';
-import { getBooks } from '@/lib/store';
-import { Book, Role } from '@/lib/types';
+import { toggleReadingList } from '@/app/actions/user';
+import { getBooks, getUsers } from '@/lib/store';
+import { Book, Role, User } from '@/lib/types';
 import { getSession } from '@/app/actions/auth';
 import { hasPermission } from '@/lib/auth';
 
 export default function BooksPage() {
   const { toast } = useToast();
   const [books, setBooks] = useState<Book[]>([]);
-  const [userRole, setUserRole] = useState<Role>('USER');
+  const [user, setUser] = useState<User | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | undefined>();
   const [isLoading, setIsLoading] = useState(false);
 
-  // Use useEffect to fetch client-side for dynamic reactivity in this demo environment
   useEffect(() => {
     async function loadData() {
       const session = await getSession();
-      if (session) setUserRole(session.role);
+      if (session) {
+        // Fetch full user data to get reading list
+        const users = getUsers();
+        const fullUser = users.find(u => u.id === session.id);
+        if (fullUser) setUser(fullUser);
+      }
       setBooks(getBooks());
     }
     loadData();
@@ -82,14 +87,32 @@ export default function BooksPage() {
     }
   };
 
+  const handleToggleToRead = async (bookId: string) => {
+    try {
+      const result = await toggleReadingList(bookId);
+      const users = getUsers();
+      const updatedUser = users.find(u => u.id === user?.id);
+      if (updatedUser) setUser({...updatedUser});
+      
+      toast({ 
+        title: result.isInList ? 'Added to Reading List' : 'Removed from Reading List',
+        description: 'Your personal inventory has been updated.'
+      });
+    } catch (e) {
+      toast({ title: 'Error', description: 'Failed to update reading list', variant: 'destructive' });
+    }
+  };
+
+  const readingListBooks = books.filter(b => user?.readingList?.includes(b.id));
+
   return (
     <div className="space-y-8 animate-in-fade">
       <div className="flex justify-between items-center">
         <div className="flex flex-col gap-1">
-          <h1 className="text-4xl font-headline font-bold">Inventory Nexus</h1>
-          <p className="text-muted-foreground">Manage and track your global book distribution catalog.</p>
+          <h1 className="text-4xl font-headline font-bold">Catalog Archive</h1>
+          <p className="text-muted-foreground">Browse the central repository and manage your personal reading list.</p>
         </div>
-        {hasPermission(userRole, 'CREATE') && (
+        {hasPermission(user?.role || 'USER', 'CREATE') && (
           <Button onClick={handleAdd} className="rounded-xl px-6 h-12 shadow-lg shadow-primary/20 gap-2">
             <Plus className="w-5 h-5" />
             Add New Book
@@ -97,12 +120,66 @@ export default function BooksPage() {
         )}
       </div>
 
-      <BookList 
-        books={books} 
-        userRole={userRole}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-      />
+      <div className={user?.role === 'USER' ? "grid grid-cols-1 lg:grid-cols-12 gap-8" : "space-y-6"}>
+        <div className={user?.role === 'USER' ? "lg:col-span-8 space-y-4" : "space-y-4"}>
+          <div className="flex items-center gap-2 mb-2 px-2">
+            <Library className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Global Catalog</h2>
+          </div>
+          <BookList 
+            books={books} 
+            userRole={user?.role || 'USER'}
+            readingList={user?.readingList || []}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleToRead={handleToggleToRead}
+          />
+        </div>
+
+        {user?.role === 'USER' && (
+          <div className="lg:col-span-4 space-y-4">
+            <div className="flex items-center gap-2 mb-2 px-2">
+              <Bookmark className="w-4 h-4 text-secondary" />
+              <h2 className="text-sm font-bold uppercase tracking-widest text-secondary">My Reading List</h2>
+            </div>
+            <div className="glass-card rounded-2xl p-6 min-h-[400px]">
+              {readingListBooks.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-4 opacity-50">
+                  <div className="p-4 bg-muted/40 rounded-full">
+                    <BookOpenCheck className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-sm font-semibold">Your list is empty</p>
+                    <p className="text-xs text-muted-foreground">Bookmark books from the catalog to track them here.</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {readingListBooks.map(book => (
+                    <div key={book.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group">
+                      <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground shrink-0">
+                        <Bookmark className="w-4 h-4 opacity-40 group-hover:text-secondary transition-colors" />
+                      </div>
+                      <div className="flex-1 overflow-hidden">
+                        <p className="text-sm font-bold truncate">{book.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">{book.author}</p>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="rounded-full h-8 w-8 hover:text-destructive"
+                        onClick={() => handleToggleToRead(book.id)}
+                      >
+                        <Plus className="w-4 h-4 rotate-45" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="glass border-white/10 sm:max-w-[600px]">

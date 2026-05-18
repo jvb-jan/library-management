@@ -30,7 +30,9 @@ import {
   Trash2, 
   Filter, 
   ArrowUpDown,
-  BookMarked
+  BookMarked,
+  Bookmark,
+  BookmarkCheck
 } from 'lucide-react';
 import { hasPermission } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -38,11 +40,20 @@ import { cn } from '@/lib/utils';
 interface BookListProps {
   books: Book[];
   userRole: Role;
+  readingList: string[];
   onEdit: (book: Book) => void;
   onDelete: (id: string) => void;
+  onToggleToRead?: (id: string) => void;
 }
 
-export function BookList({ books, userRole, onEdit, onDelete }: BookListProps) {
+export function BookList({ 
+  books, 
+  userRole, 
+  readingList,
+  onEdit, 
+  onDelete,
+  onToggleToRead
+}: BookListProps) {
   const [search, setSearch] = useState('');
   const [genreFilter, setGenreFilter] = useState('ALL');
 
@@ -94,7 +105,7 @@ export function BookList({ books, userRole, onEdit, onDelete }: BookListProps) {
               variant={genreFilter === g ? "default" : "outline"}
               size="sm"
               onClick={() => setGenreFilter(g)}
-              className="rounded-full text-xs h-8 glass"
+              className="rounded-full text-xs h-8 glass whitespace-nowrap"
             >
               {g}
             </Button>
@@ -102,12 +113,12 @@ export function BookList({ books, userRole, onEdit, onDelete }: BookListProps) {
         </div>
       </div>
 
-      <div className="glass-card rounded-2xl overflow-hidden">
+      <div className="glass-card rounded-2xl overflow-hidden border-white/5">
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-b border-white/5 hover:bg-transparent">
-              <TableHead className="w-[300px]">Book Information</TableHead>
-              <TableHead>Genre</TableHead>
+              <TableHead className={cn(userRole === 'USER' ? "w-[250px]" : "w-[300px]")}>Identity</TableHead>
+              {userRole !== 'USER' && <TableHead>Genre</TableHead>}
               <TableHead>Price</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -116,62 +127,89 @@ export function BookList({ books, userRole, onEdit, onDelete }: BookListProps) {
           <TableBody>
             {filteredBooks.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={userRole === 'USER' ? 4 : 5} className="h-32 text-center text-muted-foreground">
                   No books found. Try adjusting your search.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredBooks.map((book) => (
-                <TableRow key={book.id} className="border-b border-white/5 group hover:bg-white/5">
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground group-hover:scale-105 transition-transform duration-300">
-                        <BookMarked className="w-5 h-5 opacity-40" />
+              filteredBooks.map((book) => {
+                const isInReadingList = readingList.includes(book.id);
+                return (
+                  <TableRow key={book.id} className="border-b border-white/5 group hover:bg-white/5">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground group-hover:scale-105 transition-transform duration-300">
+                          <BookMarked className="w-5 h-5 opacity-40" />
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                          <span className="font-semibold text-sm line-clamp-1">{book.title}</span>
+                          <span className="text-xs text-muted-foreground truncate">{book.author}</span>
+                        </div>
                       </div>
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-sm line-clamp-1">{book.title}</span>
-                        <span className="text-xs text-muted-foreground">{book.author}</span>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="font-normal text-[10px] uppercase tracking-wider">{book.genre}</Badge>
-                  </TableCell>
-                  <TableCell className="font-mono text-xs font-semibold">
-                    ${book.price.toFixed(2)}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(book.availabilityStatus)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="glass">
-                        {hasPermission(userRole, 'UPDATE') && (
-                          <DropdownMenuItem onClick={() => onEdit(book)} className="gap-2">
-                            <Edit className="w-3.5 h-3.5" /> Edit
-                          </DropdownMenuItem>
-                        )}
-                        {hasPermission(userRole, 'DELETE') && (
-                          <DropdownMenuItem 
-                            onClick={() => onDelete(book.id)}
-                            className="text-destructive gap-2"
+                    </TableCell>
+                    {userRole !== 'USER' && (
+                      <TableCell>
+                        <Badge variant="outline" className="font-normal text-[10px] uppercase tracking-wider">{book.genre}</Badge>
+                      </TableCell>
+                    )}
+                    <TableCell className="font-mono text-xs font-semibold">
+                      ${book.price.toFixed(2)}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(book.availabilityStatus)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {userRole === 'USER' && onToggleToRead && (
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className={cn(
+                              "rounded-full h-8 w-8",
+                              isInReadingList ? "text-secondary bg-secondary/10" : "text-muted-foreground hover:text-secondary hover:bg-secondary/10"
+                            )}
+                            onClick={() => onToggleToRead(book.id)}
+                            title={isInReadingList ? "Remove from List" : "Add to Reading List"}
                           >
-                            <Trash2 className="w-3.5 h-3.5" /> Delete
-                          </DropdownMenuItem>
+                            {isInReadingList ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                          </Button>
                         )}
-                        <DropdownMenuItem className="gap-2">
-                          View Details
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
+                        {(hasPermission(userRole, 'UPDATE') || hasPermission(userRole, 'DELETE')) ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
+                                <MoreVertical className="w-4 h-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="glass">
+                              {hasPermission(userRole, 'UPDATE') && (
+                                <DropdownMenuItem onClick={() => onEdit(book)} className="gap-2 text-xs">
+                                  <Edit className="w-3.5 h-3.5" /> Edit
+                                </DropdownMenuItem>
+                              )}
+                              {hasPermission(userRole, 'DELETE') && (
+                                <DropdownMenuItem 
+                                  onClick={() => onDelete(book.id)}
+                                  className="text-destructive gap-2 text-xs"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" /> Delete
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem className="gap-2 text-xs">
+                                View Details
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : (
+                           <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
+                              <MoreVertical className="w-4 h-4" />
+                           </Button>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
         </Table>

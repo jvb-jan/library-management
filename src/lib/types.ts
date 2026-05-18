@@ -7,6 +7,7 @@ export interface User {
   username: string;
   role: Role;
   password?: string;
+  readingList?: string[]; // Array of book IDs
 }
 
 export interface Book {

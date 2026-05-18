@@ -105,9 +105,9 @@ const INITIAL_BOOKS: Book[] = [
 ];
 
 const INITIAL_USERS: User[] = [
-  { id: 'u1', username: 'admin', role: 'ADMIN', password: 'password' },
-  { id: 'u2', username: 'librarian', role: 'LIBRARIAN', password: 'password' },
-  { id: 'u3', username: 'user', role: 'USER', password: 'password' },
+  { id: 'u1', username: 'admin', role: 'ADMIN', password: 'password', readingList: [] },
+  { id: 'u2', username: 'librarian', role: 'LIBRARIAN', password: 'password', readingList: [] },
+  { id: 'u3', username: 'user', role: 'USER', password: 'password', readingList: [] },
 ];
 
 declare global {
@@ -131,6 +131,15 @@ export const setBooks = (books: Book[]) => {
 
 export const setUsers = (users: User[]) => {
   global.__db_users = users;
+};
+
+export const updateUser = (id: string, data: Partial<User>) => {
+  const users = getUsers();
+  const index = users.findIndex(u => u.id === id);
+  if (index !== -1) {
+    users[index] = { ...users[index], ...data };
+    setUsers(users);
+  }
 };
 
 export const getStats = (): DashboardStats => {
