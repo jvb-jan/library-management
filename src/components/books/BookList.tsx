@@ -105,7 +105,7 @@ export function BookList({
               key={g}
               variant={genreFilter === g ? "default" : "outline"}
               size="sm"
-              onClick={() => setGenreFilter(g)}
+              onClick={() => genreFilter !== g && setGenreFilter(g)}
               className="rounded-full text-xs h-8 glass whitespace-nowrap"
             >
               {g}
