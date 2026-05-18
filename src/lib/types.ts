@@ -16,7 +16,7 @@ export interface Book {
   author: string;
   genre: string;
   description: string;
-  price: number;
+  bookIdNumber: string; // Replaced price with bookIdNumber
   availabilityStatus: AvailabilityStatus;
   createdAt: string;
 }

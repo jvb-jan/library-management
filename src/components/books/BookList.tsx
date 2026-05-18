@@ -67,7 +67,8 @@ export function BookList({
       const matchesSearch = 
         b.title.toLowerCase().includes(search.toLowerCase()) ||
         b.author.toLowerCase().includes(search.toLowerCase()) ||
-        b.genre.toLowerCase().includes(search.toLowerCase());
+        b.genre.toLowerCase().includes(search.toLowerCase()) ||
+        b.bookIdNumber.toLowerCase().includes(search.toLowerCase());
       
       const matchesGenre = genreFilter === 'ALL' || b.genre === genreFilter;
 
@@ -92,7 +93,7 @@ export function BookList({
         <div className="relative w-full md:max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
-            placeholder="Search by title, author, or genre..." 
+            placeholder="Search by title, author, genre or ID..." 
             className="pl-10 glass"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -119,7 +120,7 @@ export function BookList({
             <TableRow className="border-b border-white/5 hover:bg-transparent">
               <TableHead className={cn(userRole === 'USER' ? "w-[250px]" : "w-[300px]")}>Identity</TableHead>
               {userRole !== 'USER' && <TableHead>Genre</TableHead>}
-              <TableHead>Price</TableHead>
+              <TableHead>Book ID</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -153,7 +154,7 @@ export function BookList({
                       </TableCell>
                     )}
                     <TableCell className="font-mono text-xs font-semibold">
-                      ${book.price.toFixed(2)}
+                      {book.bookIdNumber}
                     </TableCell>
                     <TableCell>
                       {getStatusBadge(book.availabilityStatus)}

@@ -32,7 +32,7 @@ const bookSchema = z.object({
   author: z.string().min(1, 'Author is required'),
   genre: z.string().min(1, 'Genre is required'),
   description: z.string().min(10, 'Description should be longer'),
-  price: z.coerce.number().min(0, 'Price must be positive'),
+  bookIdNumber: z.string().min(1, 'Book ID Number is required'),
   availabilityStatus: z.enum(['AVAILABLE', 'BORROWED', 'OUT_OF_STOCK']),
 });
 
@@ -52,14 +52,14 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
       author: initialData.author,
       genre: initialData.genre,
       description: initialData.description,
-      price: initialData.price,
+      bookIdNumber: initialData.bookIdNumber,
       availabilityStatus: initialData.availabilityStatus,
     } : {
       title: '',
       author: '',
       genre: '',
       description: '',
-      price: 0,
+      bookIdNumber: '',
       availabilityStatus: 'AVAILABLE',
     },
   });
@@ -142,12 +142,12 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
           />
           <FormField
             control={form.control}
-            name="price"
+            name="bookIdNumber"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Price ($)</FormLabel>
+                <FormLabel>Book ID Number</FormLabel>
                 <FormControl>
-                  <Input type="number" step="0.01" {...field} className="glass" />
+                  <Input placeholder="e.g. BKN-1020" {...field} className="glass" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
