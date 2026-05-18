@@ -2,14 +2,14 @@ import { getStats } from '@/lib/store';
 import { getSession } from '@/app/actions/auth';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { InventoryChart } from '@/components/dashboard/InventoryChart';
+import { SystemHealth } from '@/components/dashboard/SystemHealth';
 import { 
   BookCopy, 
   Users, 
   UserRound, 
   CheckCircle2, 
   Clock,
-  ArrowUpRight,
-  Database
+  ArrowUpRight
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
@@ -78,21 +78,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="glass-card flex flex-col justify-center items-center p-10 text-center gap-6">
-           <div className="p-6 bg-primary/10 rounded-full border border-primary/20">
-              <Database className="w-12 h-12 text-primary" />
-           </div>
-           <div>
-             <h3 className="font-headline text-2xl font-bold">System Health</h3>
-             <p className="text-sm text-muted-foreground mt-2">All nexus modules operating within normal parameters. JWT shield active.</p>
-           </div>
-           <div className="flex gap-2 w-full mt-4">
-              <div className="h-1 flex-1 bg-emerald-500/30 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 w-[94%]" />
-              </div>
-              <span className="text-[10px] font-bold text-emerald-500 uppercase">94% Stability</span>
-           </div>
-        </Card>
+        <SystemHealth />
       </div>
     </div>
   );
