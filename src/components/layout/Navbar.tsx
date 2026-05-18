@@ -6,11 +6,8 @@ import { Button } from '@/components/ui/button';
 import { 
   Bell, 
   Search, 
-  Moon, 
-  Sun, 
   User as UserIcon,
   ChevronDown,
-  Settings,
   LogOut,
   Shield
 } from 'lucide-react';
@@ -70,9 +67,6 @@ export function Navbar({ user }: NavbarProps) {
             <DropdownMenuSeparator className="bg-white/5" />
             <DropdownMenuItem className="gap-2 p-3">
               <UserIcon className="w-4 h-4" /> Profile Details
-            </DropdownMenuItem>
-            <DropdownMenuItem className="gap-2 p-3">
-              <Settings className="w-4 h-4" /> System Settings
             </DropdownMenuItem>
             {user.role === 'ADMIN' && (
               <DropdownMenuItem className="gap-2 p-3 text-secondary">

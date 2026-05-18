@@ -9,10 +9,8 @@ import {
   Users, 
   Activity, 
   BarChart3, 
-  Settings, 
   LogOut,
   Database,
-  Library,
   Bookmark
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -39,7 +37,6 @@ export function Sidebar({ user }: SidebarProps) {
         { label: 'Add Book', icon: PlusCircle, href: '/dashboard/books?action=add' },
         { label: 'Manage Users', icon: Users, href: '/dashboard/users' },
         { label: 'Activity Logs', icon: Activity, href: '/dashboard/activity' },
-        { label: 'Settings', icon: Settings, href: '/dashboard/settings' },
       ];
     }
 
@@ -47,7 +44,6 @@ export function Sidebar({ user }: SidebarProps) {
       return [
         ...base,
         { label: 'Updates', icon: BarChart3, href: '/dashboard/activity' },
-        { label: 'Settings', icon: Settings, href: '/dashboard/settings' },
       ];
     }
 
