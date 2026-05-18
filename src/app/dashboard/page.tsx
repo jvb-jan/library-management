@@ -1,8 +1,6 @@
 import { getStats } from '@/lib/store';
 import { getSession } from '@/app/actions/auth';
 import { StatCard } from '@/components/dashboard/StatCard';
-import { InventoryChart } from '@/components/dashboard/InventoryChart';
-import { SystemHealth } from '@/components/dashboard/SystemHealth';
 import { 
   BookCopy, 
   Users, 
@@ -12,6 +10,13 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import dynamic from 'next/dynamic';
+
+// Import InventoryChart with SSR disabled to prevent Recharts/hydration errors
+const InventoryChart = dynamic(() => import('@/components/dashboard/InventoryChart').then(mod => mod.InventoryChart), { 
+  ssr: false,
+  loading: () => <div className="h-[300px] w-full bg-muted/10 animate-pulse rounded-xl flex items-center justify-center text-xs text-muted-foreground uppercase tracking-widest">Loading Analytics...</div>
+});
 
 export default async function DashboardPage() {
   const stats = getStats();
@@ -64,8 +69,8 @@ export default async function DashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <Card className="lg:col-span-2 glass-card">
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="glass-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               Inventory Distribution
@@ -77,8 +82,6 @@ export default async function DashboardPage() {
             <InventoryChart data={chartData} />
           </CardContent>
         </Card>
-
-        <SystemHealth />
       </div>
     </div>
   );
