@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Database, Loader2, ShieldCheck, ArrowRight } from 'lucide-react';
+import { Database, Loader2, ShieldCheck, ArrowRight, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -59,6 +59,16 @@ export default function LoginPage() {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4 pt-6">
+            <div className="bg-primary/5 border border-primary/10 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Info className="w-4 h-4 text-primary" />
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">Sample Credentials</span>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Use <code className="text-primary font-bold">admin</code>, <code className="text-primary font-bold">librarian</code>, or <code className="text-primary font-bold">user</code> with password <code className="text-primary font-bold">password</code>.
+              </p>
+            </div>
+
             <div className="space-y-2">
               <label className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">Username</label>
               <Input 
@@ -98,7 +108,7 @@ export default function LoginPage() {
       </Card>
       
       <div className="fixed bottom-8 text-center text-[10px] text-muted-foreground/40 font-bold uppercase tracking-[0.2em] pointer-events-none">
-        Sample Credentials: admin/password • librarian/password • user/password
+        BiblioFlow v1.0 • Enterprise Edition
       </div>
     </div>
   );
