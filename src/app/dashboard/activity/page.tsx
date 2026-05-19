@@ -11,7 +11,7 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Clock, User as UserIcon, Book } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ActivityLog } from '@/lib/types';
 
@@ -25,6 +25,10 @@ export default function ActivityPage() {
   }, []);
 
   if (!mounted) return null;
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString();
+  };
 
   return (
     <div className="space-y-8 animate-in-fade">
@@ -56,7 +60,7 @@ export default function ActivityPage() {
                   <TableCell className="text-xs font-mono text-muted-foreground">
                     <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3" />
-                      {new Date(log.timestamp).toLocaleDateString()}
+                      {formatDate(log.timestamp)}
                     </div>
                   </TableCell>
                   <TableCell>

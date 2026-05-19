@@ -31,26 +31,26 @@ declare global {
 }
 
 export const getBooks = () => {
-  if (!global.__db_books) global.__db_books = [...INITIAL_BOOKS];
-  return global.__db_books;
+  if (!globalThis.__db_books) globalThis.__db_books = [...INITIAL_BOOKS];
+  return globalThis.__db_books;
 };
 
 export const getUsers = () => {
-  if (!global.__db_users) global.__db_users = [...INITIAL_USERS];
-  return global.__db_users;
+  if (!globalThis.__db_users) globalThis.__db_users = [...INITIAL_USERS];
+  return globalThis.__db_users;
 };
 
 export const getLogs = () => {
-  if (!global.__db_logs) global.__db_logs = [...INITIAL_LOGS];
-  return global.__db_logs;
+  if (!globalThis.__db_logs) globalThis.__db_logs = [...INITIAL_LOGS];
+  return globalThis.__db_logs;
 };
 
 export const setBooks = (books: Book[]) => {
-  global.__db_books = books;
+  globalThis.__db_books = books;
 };
 
 export const setUsers = (users: User[]) => {
-  global.__db_users = users;
+  globalThis.__db_users = users;
 };
 
 export const addLog = (log: Omit<ActivityLog, 'id' | 'timestamp'>) => {
@@ -60,7 +60,7 @@ export const addLog = (log: Omit<ActivityLog, 'id' | 'timestamp'>) => {
     id: Math.random().toString(36).substring(7),
     timestamp: new Date().toISOString(),
   };
-  global.__db_logs = [newLog, ...logs].slice(0, 50);
+  globalThis.__db_logs = [newLog, ...logs].slice(0, 50);
 };
 
 export const updateUser = (id: string, data: Partial<User>) => {
