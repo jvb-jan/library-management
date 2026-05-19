@@ -6,12 +6,12 @@ import { Card } from '@/components/ui/card';
 
 export function SystemHealth() {
   const [uptime, setUptime] = useState<string | null>(null);
-  const [lastCheck, setLastCheck] = useState<string>('');
+  const [lastCheck, setLastCheck] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate fetching live uptime to avoid hydration mismatch
+    // Only set these on the client to avoid hydration mismatch
     setUptime('99.9%');
-    setLastCheck(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+    setLastCheck(new Date().toLocaleDateString());
   }, []);
 
   return (

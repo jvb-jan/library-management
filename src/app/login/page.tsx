@@ -4,10 +4,10 @@ import { useState } from 'react';
 import { login, register } from '@/app/actions/auth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { Database, Loader2, ShieldCheck, ArrowRight, Info, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Mail, Lock, Eye, EyeOff, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -128,7 +128,11 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-14 text-lg font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full h-14 text-lg font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]" 
+                disabled={isLoading}
+              >
                 {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Sign In'}
               </Button>
             </form>
@@ -176,7 +180,11 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              <Button type="submit" className="w-full h-14 text-lg font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                className="w-full h-14 text-lg font-bold bg-[#2563EB] hover:bg-[#1D4ED8] text-white rounded-2xl shadow-xl shadow-blue-500/20 transition-all active:scale-[0.98]" 
+                disabled={isLoading}
+              >
                 {isLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : 'Create Account'}
               </Button>
             </form>
