@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { User, DashboardStats, ActivityLog } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { 
@@ -21,6 +22,12 @@ interface LibrarianDashboardProps {
 }
 
 export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="space-y-8 animate-in-fade">
       <header className="flex flex-col gap-2">
@@ -112,7 +119,9 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
                     </div>
                     <div>
                       <p className="text-sm font-semibold">{log.action}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{new Date(log.timestamp).toLocaleDateString()}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        {mounted ? new Date(log.timestamp).toLocaleDateString() : '...'}
+                      </p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[10px] uppercase tracking-widest">Update</Badge>

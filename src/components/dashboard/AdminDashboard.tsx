@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { User, DashboardStats, ActivityLog } from '@/lib/types';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { 
@@ -24,6 +25,12 @@ interface AdminDashboardProps {
 }
 
 export function AdminDashboard({ user, stats, logs }: AdminDashboardProps) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const chartData = [
     { name: 'Available', value: stats.availableBooks, fill: 'hsl(var(--primary))' },
     { name: 'Borrowed', value: stats.borrowedBooks, fill: 'hsl(var(--secondary))' },
@@ -92,7 +99,9 @@ export function AdminDashboard({ user, stats, logs }: AdminDashboardProps) {
                 <div className="flex flex-col gap-1 flex-1">
                   <div className="flex justify-between items-start">
                     <span className="text-xs font-bold text-slate-200">{log.action}</span>
-                    <span className="text-[10px] text-muted-foreground">{new Date(log.timestamp).toLocaleDateString()}</span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {mounted ? new Date(log.timestamp).toLocaleDateString() : '...'}
+                    </span>
                   </div>
                   <span className="text-[10px] uppercase tracking-widest text-muted-foreground">User: {log.username}</span>
                 </div>

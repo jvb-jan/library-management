@@ -1,6 +1,7 @@
-import { getSession } from '@/app/actions/auth';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { getLogs } from '@/lib/store';
-import { redirect } from 'next/navigation';
 import { 
   Table, 
   TableBody, 
@@ -12,14 +13,18 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Activity, Clock, User as UserIcon, Book } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ActivityLog } from '@/lib/types';
 
-export default async function ActivityPage() {
-  const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'LIBRARIAN')) {
-    redirect('/dashboard');
-  }
+export default function ActivityPage() {
+  const [logs, setLogs] = useState<ActivityLog[]>([]);
+  const [mounted, setMounted] = useState(false);
 
-  const logs = getLogs();
+  useEffect(() => {
+    setLogs(getLogs());
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
 
   return (
     <div className="space-y-8 animate-in-fade">
