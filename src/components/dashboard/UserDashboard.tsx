@@ -29,7 +29,7 @@ export function UserDashboard({ user, books }: UserDashboardProps) {
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Discover the collection</span>
         </div>
         <h1 className="text-5xl font-headline font-bold text-white tracking-tight">
-          Welcome to <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">BiblioFlow</span>, {user.username}
+          Welcome to <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">BenakaLib</span>, {user.username}
         </h1>
         <p className="text-muted-foreground text-xl max-w-3xl">
           Your modern digital library. Browse thousands of curated titles and build your personal collection.

@@ -64,7 +64,7 @@ export function Sidebar({ user }: SidebarProps) {
           <Database className="w-6 h-6 text-white" />
         </div>
         <div className="flex flex-col">
-          <span className="font-headline text-2xl font-bold tracking-tighter text-white">BiblioFlow</span>
+          <span className="font-headline text-2xl font-bold tracking-tighter text-white">BenakaLib</span>
           <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-muted-foreground/50 leading-none">Enterprise Nexus</span>
         </div>
       </div>

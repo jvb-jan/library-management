@@ -3,7 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'BiblioFlow | Modern Book Management',
+  title: 'BenakaLib | Modern Book Management',
   description: 'Enterprise-grade Book Management System',
 };
 

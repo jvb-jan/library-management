@@ -181,7 +181,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               {editingBook ? 'Refine Entry' : 'New Archive Entry'}
             </DialogTitle>
             <DialogDescription className="text-slate-400">
-              {editingBook ? 'Update the metadata for this catalog object.' : 'Initialize a new entry in the BiblioFlow central repository.'}
+              {editingBook ? 'Update the metadata for this catalog object.' : 'Initialize a new entry in the BenakaLib central repository.'}
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">

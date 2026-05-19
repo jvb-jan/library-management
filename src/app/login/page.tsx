@@ -140,7 +140,7 @@ export default function LoginPage() {
 
           <TabsContent value="register">
             <div className="text-center space-y-2 mb-8">
-              <h1 className="text-3xl font-headline font-bold text-white">Join BiblioFlow</h1>
+              <h1 className="text-3xl font-headline font-bold text-white">Join BenakaLib</h1>
               <p className="text-slate-400">Create your global researcher account</p>
             </div>
 
@@ -205,7 +205,7 @@ export default function LoginPage() {
       </Card>
       
       <div className="fixed bottom-8 text-[10px] text-slate-600 font-bold uppercase tracking-[0.3em] pointer-events-none">
-        BiblioFlow Nexus • Protected Interface
+        BenakaLib Nexus • Protected Interface
       </div>
     </div>
   );

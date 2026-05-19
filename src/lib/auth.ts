@@ -1,6 +1,6 @@
 import { Role, User } from './types';
 
-export const AUTH_COOKIE_NAME = 'biblioflow_auth_token';
+export const AUTH_COOKIE_NAME = 'benakalib_auth_token';
 
 // Simple base64-based "JWT" for demo purposes in this environment
 export function encodeToken(user: User): string {
