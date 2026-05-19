@@ -10,7 +10,8 @@ import {
   TableRow 
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { ShieldCheck, User as UserIcon } from 'lucide-react';
+import { User as UserIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 export default async function UsersPage() {
   const session = await getSession();
@@ -23,7 +24,7 @@ export default async function UsersPage() {
   return (
     <div className="space-y-8 animate-in-fade">
       <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-headline font-bold">Access Control Shield</h1>
+        <h1 className="text-4xl font-headline font-bold text-white">Access Control Shield</h1>
         <p className="text-muted-foreground">Manage organizational roles and nexus permissions.</p>
       </div>
 
@@ -68,5 +69,3 @@ export default async function UsersPage() {
     </div>
   );
 }
-
-import { cn } from '@/lib/utils';
