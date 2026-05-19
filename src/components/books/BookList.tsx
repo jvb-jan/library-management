@@ -32,7 +32,8 @@ import {
   ArrowUpDown,
   BookMarked,
   Bookmark,
-  BookmarkCheck
+  BookmarkCheck,
+  Eye
 } from 'lucide-react';
 import { hasPermission } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -43,6 +44,7 @@ interface BookListProps {
   readingList: string[];
   onEdit: (book: Book) => void;
   onDelete: (id: string) => void;
+  onViewDetails: (book: Book) => void;
   onToggleToRead?: (id: string) => void;
 }
 
@@ -52,6 +54,7 @@ export function BookList({
   readingList,
   onEdit, 
   onDelete,
+  onViewDetails,
   onToggleToRead
 }: BookListProps) {
   const [search, setSearch] = useState('');
@@ -175,37 +178,31 @@ export function BookList({
                             {isInReadingList ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
                           </Button>
                         )}
-                        {(hasPermission(userRole, 'UPDATE') || hasPermission(userRole, 'DELETE')) ? (
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
-                                <MoreVertical className="w-4 h-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="glass">
-                              {hasPermission(userRole, 'UPDATE') && (
-                                <DropdownMenuItem onClick={() => onEdit(book)} className="gap-2 text-xs">
-                                  <Edit className="w-3.5 h-3.5" /> Edit
-                                </DropdownMenuItem>
-                              )}
-                              {hasPermission(userRole, 'DELETE') && (
-                                <DropdownMenuItem 
-                                  onClick={() => onDelete(book.id)}
-                                  className="text-destructive gap-2 text-xs"
-                                >
-                                  <Trash2 className="w-3.5 h-3.5" /> Delete
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem className="gap-2 text-xs">
-                                View Details
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        ) : (
-                           <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-white/10">
                               <MoreVertical className="w-4 h-4" />
-                           </Button>
-                        )}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="glass">
+                            <DropdownMenuItem onClick={() => onViewDetails(book)} className="gap-2 text-xs">
+                              <Eye className="w-3.5 h-3.5" /> Details
+                            </DropdownMenuItem>
+                            {hasPermission(userRole, 'UPDATE') && (
+                              <DropdownMenuItem onClick={() => onEdit(book)} className="gap-2 text-xs">
+                                <Edit className="w-3.5 h-3.5" /> Edit
+                              </DropdownMenuItem>
+                            )}
+                            {hasPermission(userRole, 'DELETE') && (
+                              <DropdownMenuItem 
+                                onClick={() => onDelete(book.id)}
+                                className="text-destructive gap-2 text-xs"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" /> Delete
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </TableCell>
                   </TableRow>

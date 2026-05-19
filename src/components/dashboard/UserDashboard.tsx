@@ -1,11 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { User, Book } from '@/lib/types';
 import { BookCarousel } from '@/components/books/BookCarousel';
+import { BookDetailsDialog } from '@/components/books/BookDetailsDialog';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Library, Sparkles, TrendingUp, Bookmark } from 'lucide-react';
+import { Library, Sparkles, TrendingUp, Bookmark, ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 interface UserDashboardProps {
   user: User;
@@ -13,6 +16,7 @@ interface UserDashboardProps {
 }
 
 export function UserDashboard({ user, books }: UserDashboardProps) {
+  const [viewingBook, setViewingBook] = useState<Book | null>(null);
   const featuredBooks = books.slice(0, 5);
   const trendingBooks = books.slice(5, 9);
   const categories = Array.from(new Set(books.map(b => b.genre))).slice(0, 6);
@@ -39,7 +43,7 @@ export function UserDashboard({ user, books }: UserDashboardProps) {
             <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Featured Selection</h2>
           </div>
         </div>
-        <BookCarousel books={featuredBooks} />
+        <BookCarousel books={featuredBooks} onViewDetails={setViewingBook} />
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
@@ -62,9 +66,12 @@ export function UserDashboard({ user, books }: UserDashboardProps) {
                       <h3 className="font-bold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">{book.title}</h3>
                       <p className="text-sm text-muted-foreground mt-1">{book.author}</p>
                     </div>
-                    <Link href={`/dashboard/books`} className="text-xs font-bold text-secondary flex items-center gap-1 hover:underline">
-                      View Details <ArrowRightIcon className="w-3 h-3" />
-                    </Link>
+                    <button 
+                      onClick={() => setViewingBook(book)} 
+                      className="text-xs font-bold text-secondary flex items-center gap-1 hover:underline text-left w-fit"
+                    >
+                      View Details <ArrowRight className="w-3 h-3" />
+                    </button>
                   </div>
                 </CardContent>
               </Card>
@@ -102,6 +109,12 @@ export function UserDashboard({ user, books }: UserDashboardProps) {
           </Card>
         </div>
       </div>
+
+      <BookDetailsDialog 
+        book={viewingBook} 
+        isOpen={viewingBook !== null} 
+        onClose={() => setViewingBook(null)} 
+      />
     </div>
   );
 }
@@ -109,11 +122,5 @@ export function UserDashboard({ user, books }: UserDashboardProps) {
 function StarIcon({ className }: { className?: string }) {
   return (
     <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-  );
-}
-
-function ArrowRightIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
   );
 }

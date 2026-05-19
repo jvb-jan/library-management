@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { BookList } from '@/components/books/BookList';
 import { BookForm } from '@/components/books/BookForm';
+import { BookDetailsDialog } from '@/components/books/BookDetailsDialog';
 import { 
   Dialog, 
   DialogContent, 
@@ -32,18 +33,19 @@ interface BookManagerProps {
 export function BookManager({ initialBooks, user, initialAction }: BookManagerProps) {
   const { toast } = useToast();
   const router = useRouter();
-  const [isDialogOpen, setIsDialogOpen] = useState(initialAction === 'add');
+  const [isFormOpen, setIsFormOpen] = useState(initialAction === 'add');
   const [editingBook, setEditingBook] = useState<Book | undefined>();
+  const [viewingBook, setViewingBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAdd = () => {
     setEditingBook(undefined);
-    setIsDialogOpen(true);
+    setIsFormOpen(true);
   };
 
   const handleEdit = (book: Book) => {
     setEditingBook(book);
-    setIsDialogOpen(true);
+    setIsFormOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -68,7 +70,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
         await createBook(data);
         toast({ title: 'Index Entry Created', description: 'New book added to the repository.' });
       }
-      setIsDialogOpen(false);
+      setIsFormOpen(false);
       router.refresh();
     } catch (e) {
       toast({ title: 'Operation Failed', description: 'Unauthorized or validation error.', variant: 'destructive' });
@@ -119,6 +121,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
             readingList={user?.readingList || []}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onViewDetails={setViewingBook}
             onToggleToRead={handleToggleToRead}
           />
         </div>
@@ -143,7 +146,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               ) : (
                 <div className="space-y-4">
                   {readingListBooks.map(book => (
-                    <div key={book.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group">
+                    <div key={book.id} className="flex items-center gap-4 p-3 bg-white/5 rounded-xl hover:bg-white/10 transition-colors group cursor-pointer" onClick={() => setViewingBook(book)}>
                       <div className="w-10 h-14 bg-muted/40 rounded-md flex items-center justify-center text-muted-foreground shrink-0 overflow-hidden">
                         <Bookmark className="w-4 h-4 opacity-40 group-hover:text-secondary transition-colors" />
                       </div>
@@ -155,7 +158,10 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
                         variant="ghost" 
                         size="icon" 
                         className="rounded-full h-8 w-8 hover:text-destructive"
-                        onClick={() => handleToggleToRead(book.id)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleToRead(book.id);
+                        }}
                       >
                         <Plus className="w-4 h-4 rotate-45" />
                       </Button>
@@ -168,7 +174,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
         )}
       </div>
 
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
         <DialogContent className="glass border-white/10 sm:max-w-[600px] text-slate-100">
           <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-white">
@@ -187,6 +193,12 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
           </div>
         </DialogContent>
       </Dialog>
+
+      <BookDetailsDialog 
+        book={viewingBook} 
+        isOpen={viewingBook !== null} 
+        onClose={() => setViewingBook(null)} 
+      />
     </div>
   );
 }

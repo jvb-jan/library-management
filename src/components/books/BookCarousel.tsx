@@ -16,9 +16,10 @@ import { Button } from '@/components/ui/button';
 
 interface BookCarouselProps {
   books: Book[];
+  onViewDetails: (book: Book) => void;
 }
 
-export function BookCarousel({ books }: BookCarouselProps) {
+export function BookCarousel({ books, onViewDetails }: BookCarouselProps) {
   return (
     <Carousel
       opts={{
@@ -47,7 +48,12 @@ export function BookCarousel({ books }: BookCarouselProps) {
                     </p>
                     <div className="flex items-center justify-between pt-2">
                        <span className="text-xs font-bold uppercase tracking-widest text-secondary">{book.genre}</span>
-                       <Button size="sm" variant="ghost" className="h-8 gap-2 glass rounded-full px-4 text-xs">
+                       <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="h-8 gap-2 glass rounded-full px-4 text-xs"
+                        onClick={() => onViewDetails(book)}
+                       >
                          <Info className="w-3 h-3" /> Details
                        </Button>
                     </div>
