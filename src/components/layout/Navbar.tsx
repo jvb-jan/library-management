@@ -3,6 +3,7 @@
 import { User } from '@/lib/types';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { 
   Bell, 
   Search, 
@@ -65,9 +66,11 @@ export function Navbar({ user }: NavbarProps) {
           <DropdownMenuContent align="end" className="glass w-56">
             <DropdownMenuLabel className="font-headline font-bold text-xs uppercase tracking-widest p-4">Nexus Account</DropdownMenuLabel>
             <DropdownMenuSeparator className="bg-white/5" />
-            <DropdownMenuItem className="gap-2 p-3">
-              <UserIcon className="w-4 h-4" /> Profile Details
-            </DropdownMenuItem>
+            <Link href="/dashboard/profile">
+              <DropdownMenuItem className="gap-2 p-3 cursor-pointer">
+                <UserIcon className="w-4 h-4" /> Profile Details
+              </DropdownMenuItem>
+            </Link>
             {user.role === 'ADMIN' && (
               <DropdownMenuItem className="gap-2 p-3 text-secondary">
                 <Shield className="w-4 h-4" /> Admin Controls

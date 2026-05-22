@@ -8,11 +8,12 @@ export interface User {
   role: Role;
   password?: string;
   readingList?: string[]; // Array of book IDs
-  // Borrower details
+  // Profile details
   fullName?: string;
   age?: number;
   branch?: string;
   usn?: string;
+  phoneNumber?: string;
 }
 
 export interface Book {

@@ -20,10 +20,11 @@ const INITIAL_USERS: User[] = [
     role: 'ADMIN', 
     password: 'password', 
     readingList: [],
-    fullName: 'System Administrator',
-    age: 32,
+    fullName: 'Arjun Mehta',
+    age: 35,
     branch: 'Infrastructure',
-    usn: 'ADMIN-001'
+    usn: 'ADMIN-001',
+    phoneNumber: '+91 98450 12345'
   },
   { 
     id: 'u2', 
@@ -31,10 +32,11 @@ const INITIAL_USERS: User[] = [
     role: 'LIBRARIAN', 
     password: 'password', 
     readingList: [],
-    fullName: 'Chief Librarian',
-    age: 28,
+    fullName: 'Priya Sharma',
+    age: 29,
     branch: 'Curation',
-    usn: 'LIB-001'
+    usn: 'LIB-001',
+    phoneNumber: '+91 99001 54321'
   },
   { 
     id: 'u3', 
@@ -42,10 +44,11 @@ const INITIAL_USERS: User[] = [
     role: 'USER', 
     password: 'password', 
     readingList: [],
-    fullName: 'Rahul Sharma',
+    fullName: 'Rahul Iyer',
     age: 21,
     branch: 'Computer Science',
-    usn: '1MS21CS001'
+    usn: '1MS21CS001',
+    phoneNumber: '+91 88776 65544'
   },
 ];
 
