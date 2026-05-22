@@ -16,7 +16,7 @@ export default async function DashboardPage() {
   const books = getBooks();
 
   if (user.role === 'ADMIN') {
-    return <AdminDashboard user={user} stats={stats} logs={logs} />;
+    return <AdminDashboard user={user} stats={stats} />;
   }
 
   if (user.role === 'LIBRARIAN') {

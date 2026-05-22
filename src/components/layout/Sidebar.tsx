@@ -36,7 +36,6 @@ export function Sidebar({ user }: SidebarProps) {
         ...base,
         { label: 'Add Book', icon: PlusCircle, href: '/dashboard/books?action=add' },
         { label: 'Manage Users', icon: Users, href: '/dashboard/users' },
-        { label: 'Activity Logs', icon: Activity, href: '/dashboard/activity' },
       ];
     }
 
