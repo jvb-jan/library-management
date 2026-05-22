@@ -12,6 +12,7 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Plus, BookOpenCheck, Bookmark, Library, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
@@ -175,8 +176,8 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
       </div>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="glass border-white/10 sm:max-w-[600px] text-slate-100">
-          <DialogHeader>
+        <DialogContent className="glass border-white/10 sm:max-w-[650px] text-slate-100 p-0 overflow-hidden flex flex-col max-h-[90vh]">
+          <DialogHeader className="p-6 pb-0">
             <DialogTitle className="text-2xl font-headline text-white">
               {editingBook ? 'Refine Entry' : 'New Archive Entry'}
             </DialogTitle>
@@ -184,13 +185,15 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               {editingBook ? 'Update the metadata for this catalog object.' : 'Initialize a new entry in the BenakaLib central repository.'}
             </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <BookForm 
-              initialData={editingBook} 
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
-          </div>
+          <ScrollArea className="flex-1 p-6">
+            <div className="pb-4">
+              <BookForm 
+                initialData={editingBook} 
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+              />
+            </div>
+          </ScrollArea>
         </DialogContent>
       </Dialog>
 
