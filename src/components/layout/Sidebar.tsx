@@ -44,7 +44,6 @@ export function Sidebar({ user }: SidebarProps) {
       return [
         ...base,
         { label: 'Books Needed', icon: ClipboardCheck, href: '/dashboard/needed' },
-        { label: 'Inventory Logs', icon: BarChart3, href: '/dashboard/activity' },
       ];
     }
 

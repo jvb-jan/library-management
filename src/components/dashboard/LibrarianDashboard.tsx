@@ -8,7 +8,6 @@ import {
   ClipboardList, 
   RefreshCcw, 
   CheckCircle,
-  AlertCircle,
   ArrowRight,
   ClipboardCheck,
   Bookmark
@@ -25,7 +24,7 @@ interface LibrarianDashboardProps {
   users: User[];
 }
 
-export function LibrarianDashboard({ user, stats, logs, books, users }: LibrarianDashboardProps) {
+export function LibrarianDashboard({ user, stats, books, users }: LibrarianDashboardProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -110,7 +109,7 @@ export function LibrarianDashboard({ user, stats, logs, books, users }: Libraria
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8">
         <Card className="glass-card border-white/5">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -127,8 +126,8 @@ export function LibrarianDashboard({ user, stats, logs, books, users }: Libraria
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {neededBooksData.slice(0, 5).map(book => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {neededBooksData.slice(0, 6).map(book => (
                 <div key={book.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
                   <div className="flex items-center gap-4">
                     <div className="p-2 bg-muted/40 rounded-lg shrink-0">
@@ -141,42 +140,14 @@ export function LibrarianDashboard({ user, stats, logs, books, users }: Libraria
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-[10px]">High Demand</Badge>
+                  <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-[10px] shrink-0">High Demand</Badge>
                 </div>
               ))}
               {neededBooksData.length === 0 && (
-                <div className="text-center py-8 text-muted-foreground italic text-sm">
+                <div className="col-span-full text-center py-8 text-muted-foreground italic text-sm">
                   No active user requests found.
                 </div>
               )}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border-white/5">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-xl">Operational Logs</CardTitle>
-              <CardDescription>Recent system events and catalog updates.</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {logs.filter(l => l.type === 'BOOK').slice(0, 5).map(log => (
-                <div key={log.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
-                  <div className="flex items-center gap-4">
-                    <div className="p-2 bg-muted/40 rounded-lg shrink-0">
-                      <RefreshCcw className="w-4 h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold">{log.action}</p>
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
-                        {mounted ? new Date(log.timestamp).toLocaleDateString() : '...'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           </CardContent>
         </Card>
