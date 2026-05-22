@@ -52,7 +52,7 @@ export function AdminDashboard({ user, stats }: AdminDashboardProps) {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-        <StatCard label="Total Books" value={stats.totalBooks} icon={BookCopy} trend="+4.2%" colorClass="text-primary" />
+        <StatCard label="Total Books" value={stats.totalBooks} icon={BookCopy} colorClass="text-primary" />
         <StatCard label="Active Users" value={stats.totalUsers} icon={Users} colorClass="text-secondary" />
         <StatCard label="Librarians" value={stats.totalLibrarians} icon={UserRound} colorClass="text-purple-400" />
         <StatCard label="Available" value={stats.availableBooks} icon={CheckCircle2} colorClass="text-emerald-400" />
