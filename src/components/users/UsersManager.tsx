@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, User as UserIcon, GraduationCap, IdCard } from 'lucide-react';
+import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Dialog, 
@@ -66,7 +66,7 @@ export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
             <TableRow className="border-b border-white/5 hover:bg-transparent">
               <TableHead>Identity</TableHead>
               <TableHead>Academic Info</TableHead>
-              <TableHead>Access Level</TableHead>
+              <TableHead>Books Borrowed</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -97,14 +97,14 @@ export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={cn(
-                    "font-bold text-[10px] uppercase tracking-wider",
-                    u.role === 'ADMIN' ? "bg-primary/20 text-primary border-primary/30" : 
-                    u.role === 'LIBRARIAN' ? "bg-secondary/20 text-secondary border-secondary/30" : 
-                    "bg-muted/50 text-muted-foreground"
-                  )}>
-                    {u.role}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 bg-primary/10 rounded-md text-primary">
+                      <BookOpen className="w-3 h-3" />
+                    </div>
+                    <span className="font-mono text-sm font-bold text-slate-200">
+                      {u.readingList?.length || 0}
+                    </span>
+                  </div>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button 
