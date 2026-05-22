@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Role } from '@/lib/types';
+import { User, Role, Book } from '@/lib/types';
 import { 
   Table, 
   TableBody, 
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen } from 'lucide-react';
+import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen, Bookmark } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Dialog, 
@@ -28,10 +28,11 @@ import { useRouter } from 'next/navigation';
 
 interface UsersManagerProps {
   users: User[];
+  books: Book[];
   currentUserRole: Role;
 }
 
-export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
+export function UsersManager({ users, books, currentUserRole }: UsersManagerProps) {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,60 +59,73 @@ export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
     }
   };
 
+  // Helper to find book title by ID
+  const getBookTitle = (id: string) => {
+    const book = books.find(b => b.id === id);
+    return book ? book.title : 'Unknown Work';
+  };
+
   return (
     <div className="space-y-6">
-      <div className="glass-card rounded-2xl overflow-hidden">
+      <div className="glass-card rounded-2xl overflow-hidden border-white/5">
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-b border-white/5 hover:bg-transparent">
               <TableHead>Identity</TableHead>
               <TableHead>Academic Info</TableHead>
-              <TableHead>Books Borrowed</TableHead>
+              <TableHead>Active Borrowing</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {users.map((u) => (
-              <TableRow key={u.id} className="border-b border-white/5 group hover:bg-white/5">
+              <TableRow key={u.id} className="border-b border-white/5 group hover:bg-white/5 transition-colors">
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    <div className="p-2 bg-muted/40 rounded-lg">
+                    <div className="p-2 bg-muted/40 rounded-lg shrink-0">
                       <UserIcon className="w-4 h-4 text-primary" />
                     </div>
-                    <div className="flex flex-col">
-                      <span className="font-semibold">{u.fullName || u.username}</span>
-                      <span className="text-[10px] text-muted-foreground font-mono uppercase">{u.usn || 'No USN Linked'}</span>
+                    <div className="flex flex-col min-w-0">
+                      <span className="font-semibold truncate">{u.fullName || u.username}</span>
+                      <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider">{u.usn || 'No USN Linked'}</span>
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
                   <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2 text-xs text-slate-300">
-                      <GraduationCap className="w-3 h-3 text-secondary" />
-                      {u.branch || 'Undesignated Branch'}
+                      <GraduationCap className="w-3 h-3 text-secondary shrink-0" />
+                      <span className="truncate">{u.branch || 'Undesignated Branch'}</span>
                     </div>
                     <div className="text-[10px] text-muted-foreground flex items-center gap-2">
-                      <IdCard className="w-3 h-3" />
+                      <IdCard className="w-3 h-3 shrink-0" />
                       Age: {u.age || 'N/A'}
                     </div>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <div className="p-1.5 bg-primary/10 rounded-md text-primary">
-                      <BookOpen className="w-3 h-3" />
-                    </div>
-                    <span className="font-mono text-sm font-bold text-slate-200">
-                      {u.readingList?.length || 0}
-                    </span>
+                  <div className="flex flex-col gap-1.5">
+                    {u.readingList && u.readingList.length > 0 ? (
+                      u.readingList.map((bookId) => (
+                        <div key={bookId} className="flex items-center gap-2 group/item">
+                          <div className="w-1 h-1 rounded-full bg-primary/40 group-hover/item:bg-primary transition-colors" />
+                          <span className="text-[11px] font-medium text-slate-400 group-hover/item:text-slate-200 transition-colors">
+                            {getBookTitle(bookId)}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <span className="text-[10px] text-muted-foreground italic">No active works</span>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="rounded-xl hover:bg-white/5"
+                    className="rounded-xl hover:bg-white/5 transition-all"
                     onClick={() => handleEdit(u)}
+                    title="Edit Borrower Profile"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -126,7 +140,7 @@ export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
         <DialogContent className="glass border-white/10 sm:max-w-[500px] text-slate-100">
           <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-white">Manage Borrower Details</DialogTitle>
-            <DialogDescription className="text-slate-400">Update academic and personal identity fields for this user record.</DialogDescription>
+            <DialogDescription className="text-slate-400">Update academic and personal identity fields for this borrower record.</DialogDescription>
           </DialogHeader>
           <div className="py-4">
             <UserForm 
