@@ -11,7 +11,8 @@ import {
   BarChart3, 
   LogOut,
   Database,
-  Bookmark
+  Bookmark,
+  ClipboardCheck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -42,7 +43,8 @@ export function Sidebar({ user }: SidebarProps) {
     if (user.role === 'LIBRARIAN') {
       return [
         ...base,
-        { label: 'Updates', icon: BarChart3, href: '/dashboard/activity' },
+        { label: 'Books Needed', icon: ClipboardCheck, href: '/dashboard/needed' },
+        { label: 'Inventory Logs', icon: BarChart3, href: '/dashboard/activity' },
       ];
     }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { User, DashboardStats, ActivityLog } from '@/lib/types';
+import { User, DashboardStats, ActivityLog, Book } from '@/lib/types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { 
   BookOpen, 
@@ -9,7 +9,9 @@ import {
   RefreshCcw, 
   CheckCircle,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  ClipboardCheck,
+  Bookmark
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -19,14 +21,26 @@ interface LibrarianDashboardProps {
   user: User;
   stats: DashboardStats;
   logs: ActivityLog[];
+  books: Book[];
+  users: User[];
 }
 
-export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProps) {
+export function LibrarianDashboard({ user, stats, logs, books, users }: LibrarianDashboardProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Aggregate "Books Needed" - count occurrences in users' reading lists
+  const neededBooksData = books.map(book => {
+    const interestedUsers = users.filter(u => u.role === 'USER' && u.readingList?.includes(book.id));
+    return {
+      ...book,
+      interestCount: interestedUsers.length
+    };
+  }).filter(b => b.interestCount > 0)
+    .sort((a, b) => b.interestCount - a.interestCount);
 
   return (
     <div className="space-y-8 animate-in-fade">
@@ -82,40 +96,77 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
           <CardContent className="pt-6">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Requires Restock</p>
-                <h3 className="text-4xl font-bold font-headline">{stats.totalBooks - stats.availableBooks - stats.borrowedBooks}</h3>
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Books Requested</p>
+                <h3 className="text-4xl font-bold font-headline">{neededBooksData.length}</h3>
               </div>
-              <div className="p-3 bg-rose-500/10 rounded-xl text-rose-500">
-                <AlertCircle className="w-6 h-6" />
+              <div className="p-3 bg-amber-500/10 rounded-xl text-amber-500">
+                <Bookmark className="w-6 h-6" />
               </div>
             </div>
-            <div className="mt-4 h-1 w-full bg-rose-500/10 rounded-full overflow-hidden">
-              <div className="h-full bg-rose-500 w-[10%]" />
+            <div className="mt-4 h-1 w-full bg-amber-500/10 rounded-full overflow-hidden">
+              <div className="h-full bg-amber-500 w-[50%]" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="glass-card border-white/5">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-xl">Inventory Status</CardTitle>
-              <CardDescription>Review and update the availability of catalog items.</CardDescription>
+              <CardTitle className="text-xl flex items-center gap-2">
+                <ClipboardCheck className="w-5 h-5 text-amber-500" />
+                Books Needed
+              </CardTitle>
+              <CardDescription>Items bookmarked by users in their reading lists.</CardDescription>
             </div>
-            <Link href="/dashboard/books">
-              <Button variant="outline" className="glass gap-2">
-                Manage All <ArrowRight className="w-4 h-4" />
+            <Link href="/dashboard/needed">
+              <Button variant="outline" size="sm" className="glass gap-2">
+                View All <ArrowRight className="w-4 h-4" />
               </Button>
             </Link>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {neededBooksData.slice(0, 5).map(book => (
+                <div key={book.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 bg-muted/40 rounded-lg shrink-0">
+                      <BookOpen className="w-4 h-4 text-secondary" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate">{book.title}</p>
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">
+                        Requested by {book.interestCount} {book.interestCount === 1 ? 'user' : 'users'}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-[10px]">High Demand</Badge>
+                </div>
+              ))}
+              {neededBooksData.length === 0 && (
+                <div className="text-center py-8 text-muted-foreground italic text-sm">
+                  No active user requests found.
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="glass-card border-white/5">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-xl">Operational Logs</CardTitle>
+              <CardDescription>Recent system events and catalog updates.</CardDescription>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {logs.filter(l => l.type === 'BOOK').slice(0, 5).map(log => (
                 <div key={log.id} className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5">
                   <div className="flex items-center gap-4">
-                    <div className="p-2 bg-muted/40 rounded-lg">
-                      <BookOpen className="w-4 h-4 text-secondary" />
+                    <div className="p-2 bg-muted/40 rounded-lg shrink-0">
+                      <RefreshCcw className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-semibold">{log.action}</p>
@@ -124,7 +175,6 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
                       </p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[10px] uppercase tracking-widest">Update</Badge>
                 </div>
               ))}
             </div>
