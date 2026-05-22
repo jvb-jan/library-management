@@ -8,6 +8,11 @@ export interface User {
   role: Role;
   password?: string;
   readingList?: string[]; // Array of book IDs
+  // Borrower details
+  fullName?: string;
+  age?: number;
+  branch?: string;
+  usn?: string;
 }
 
 export interface Book {
@@ -16,7 +21,7 @@ export interface Book {
   author: string;
   genre: string;
   description: string;
-  bookIdNumber: string; // Replaced price with bookIdNumber
+  bookIdNumber: string;
   availabilityStatus: AvailabilityStatus;
   createdAt: string;
 }

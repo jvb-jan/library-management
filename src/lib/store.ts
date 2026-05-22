@@ -14,14 +14,44 @@ const INITIAL_BOOKS: Book[] = [
 ];
 
 const INITIAL_USERS: User[] = [
-  { id: 'u1', username: 'admin', role: 'ADMIN', password: 'password', readingList: [] },
-  { id: 'u2', username: 'librarian', role: 'LIBRARIAN', password: 'password', readingList: [] },
-  { id: 'u3', username: 'user', role: 'USER', password: 'password', readingList: [] },
+  { 
+    id: 'u1', 
+    username: 'admin', 
+    role: 'ADMIN', 
+    password: 'password', 
+    readingList: [],
+    fullName: 'System Administrator',
+    age: 32,
+    branch: 'Infrastructure',
+    usn: 'ADMIN-001'
+  },
+  { 
+    id: 'u2', 
+    username: 'librarian', 
+    role: 'LIBRARIAN', 
+    password: 'password', 
+    readingList: [],
+    fullName: 'Chief Librarian',
+    age: 28,
+    branch: 'Curation',
+    usn: 'LIB-001'
+  },
+  { 
+    id: 'u3', 
+    username: 'user', 
+    role: 'USER', 
+    password: 'password', 
+    readingList: [],
+    fullName: 'Rahul Sharma',
+    age: 21,
+    branch: 'Computer Science',
+    usn: '1MS21CS001'
+  },
 ];
 
 const INITIAL_LOGS: ActivityLog[] = [
-  { id: 'l1', userId: 'u1', username: 'admin', action: 'System nexus initialized', type: 'SYSTEM', timestamp: new Date(Date.now() - 3600000).toISOString() },
-  { id: 'l2', userId: 'u2', username: 'librarian', action: 'Updated status of Dune', type: 'BOOK', timestamp: new Date(Date.now() - 1800000).toISOString() },
+  { id: 'l1', userId: 'u1', username: 'admin', action: 'System nexus initialized', type: 'SYSTEM', timestamp: new Date(Date.now() - 86400000).toISOString() },
+  { id: 'l2', userId: 'u2', username: 'librarian', action: 'Borrower record updated for user', type: 'USER', timestamp: new Date().toISOString() },
 ];
 
 declare global {
