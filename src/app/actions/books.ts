@@ -20,6 +20,12 @@ export async function createBook(data: Omit<Book, 'id' | 'createdAt'>) {
   };
 
   setBooks([newBook, ...books]);
+  
+  // If status is BORROWED, ensure we update the user registry
+  if (newBook.availabilityStatus === 'BORROWED' && newBook.borrowerUsn) {
+    await syncBorrowerRecord(newBook);
+  }
+
   addLog({
     userId: user.id,
     username: user.username,
@@ -29,6 +35,7 @@ export async function createBook(data: Omit<Book, 'id' | 'createdAt'>) {
   
   revalidatePath('/dashboard');
   revalidatePath('/dashboard/books');
+  revalidatePath('/dashboard/users');
   return newBook;
 }
 
@@ -45,55 +52,26 @@ export async function updateBook(id: string, data: Partial<Book>) {
   const oldBook = books[index];
   const updatedBook = { ...oldBook, ...data };
   
-  // If status is changed to BORROWED, ensure we update the user record
+  // Logic for BORROWED synchronization
   if (updatedBook.availabilityStatus === 'BORROWED' && updatedBook.borrowerUsn) {
-    const users = getUsers();
-    const existingUserIndex = users.findIndex(u => u.usn === updatedBook.borrowerUsn);
-    
-    if (existingUserIndex !== -1) {
-      // Update existing user
-      const borrower = users[existingUserIndex];
-      const readingList = borrower.readingList || [];
-      if (!readingList.includes(id)) {
-        readingList.push(id);
-      }
-      users[existingUserIndex] = {
-        ...borrower,
-        fullName: updatedBook.borrowerName || borrower.fullName,
-        age: updatedBook.borrowerAge || borrower.age,
-        branch: updatedBook.borrowerBranch || borrower.branch,
-        readingList
-      };
-    } else {
-      // Create new user record for this borrower
-      const newBorrower: User = {
-        id: Math.random().toString(36).substring(7),
-        username: updatedBook.borrowerUsn.toLowerCase(),
-        role: 'USER',
-        fullName: updatedBook.borrowerName,
-        age: updatedBook.borrowerAge,
-        branch: updatedBook.borrowerBranch,
-        usn: updatedBook.borrowerUsn,
-        readingList: [id]
-      };
-      users.push(newBorrower);
-    }
-    setUsers([...users]);
+    await syncBorrowerRecord(updatedBook);
   }
 
   // If status was BORROWED and changed to AVAILABLE, remove book from borrower's list
-  if (oldBook.availabilityStatus === 'BORROWED' && updatedBook.availabilityStatus === 'AVAILABLE') {
+  if (oldBook.availabilityStatus === 'BORROWED' && updatedBook.availabilityStatus !== 'BORROWED') {
     const users = getUsers();
     const borrowerIndex = users.findIndex(u => u.usn === oldBook.borrowerUsn);
     if (borrowerIndex !== -1) {
       users[borrowerIndex].readingList = users[borrowerIndex].readingList?.filter(bid => bid !== id);
       setUsers([...users]);
     }
-    // Clear borrower info on the book
-    updatedBook.borrowerName = undefined;
-    updatedBook.borrowerAge = undefined;
-    updatedBook.borrowerBranch = undefined;
-    updatedBook.borrowerUsn = undefined;
+    // Clear borrower info on the book if explicitly moving to available/out_of_stock
+    if (updatedBook.availabilityStatus === 'AVAILABLE' || updatedBook.availabilityStatus === 'OUT_OF_STOCK') {
+      updatedBook.borrowerName = undefined;
+      updatedBook.borrowerAge = undefined;
+      updatedBook.borrowerBranch = undefined;
+      updatedBook.borrowerUsn = undefined;
+    }
   }
 
   books[index] = updatedBook;
@@ -102,7 +80,7 @@ export async function updateBook(id: string, data: Partial<Book>) {
   addLog({
     userId: session.id,
     username: session.username,
-    action: `Updated book record: ${updatedBook.title} (${updatedBook.availabilityStatus})`,
+    action: `Updated book: ${updatedBook.title} (${updatedBook.availabilityStatus})`,
     type: 'BOOK'
   });
 
@@ -110,6 +88,45 @@ export async function updateBook(id: string, data: Partial<Book>) {
   revalidatePath('/dashboard/books');
   revalidatePath('/dashboard/users');
   return updatedBook;
+}
+
+/**
+ * Synchronizes borrower metadata with the central User Registry.
+ */
+async function syncBorrowerRecord(book: Book) {
+  if (!book.borrowerUsn) return;
+
+  const users = getUsers();
+  const existingUserIndex = users.findIndex(u => u.usn === book.borrowerUsn);
+  
+  if (existingUserIndex !== -1) {
+    const borrower = users[existingUserIndex];
+    const readingList = borrower.readingList || [];
+    if (!readingList.includes(book.id)) {
+      readingList.push(book.id);
+    }
+    users[existingUserIndex] = {
+      ...borrower,
+      fullName: book.borrowerName || borrower.fullName,
+      age: book.borrowerAge || borrower.age,
+      branch: book.borrowerBranch || borrower.branch,
+      readingList
+    };
+  } else {
+    // Create new student entry if USN not found
+    const newBorrower: User = {
+      id: Math.random().toString(36).substring(7),
+      username: book.borrowerUsn.toLowerCase(),
+      role: 'USER',
+      fullName: book.borrowerName,
+      age: book.borrowerAge,
+      branch: book.borrowerBranch,
+      usn: book.borrowerUsn,
+      readingList: [book.id]
+    };
+    users.push(newBorrower);
+  }
+  setUsers([...users]);
 }
 
 export async function deleteBook(id: string) {

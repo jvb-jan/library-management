@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { Book, AvailabilityStatus } from '@/lib/types';
+import { Book } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -23,7 +23,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Sparkles, Loader2, User, GraduationCap, IdCard } from 'lucide-react';
+import { Sparkles, Loader2, User } from 'lucide-react';
 import { generateBookDescriptionSummary } from '@/ai/flows/generate-book-description-summary-flow';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,7 +34,6 @@ const bookSchema = z.object({
   description: z.string().min(10, 'Description should be longer'),
   bookIdNumber: z.string().min(1, 'Book ID Number is required'),
   availabilityStatus: z.enum(['AVAILABLE', 'BORROWED', 'OUT_OF_STOCK']),
-  // Borrower details (required only if status is BORROWED)
   borrowerName: z.string().optional(),
   borrowerAge: z.coerce.number().optional(),
   borrowerBranch: z.string().optional(),
@@ -45,7 +44,7 @@ const bookSchema = z.object({
   }
   return true;
 }, {
-  message: "Borrower details (Name, USN, Age, Branch) are mandatory when status is BORROWED",
+  message: "All borrower details are required for borrowed status",
   path: ["borrowerName"]
 });
 
@@ -53,9 +52,10 @@ interface BookFormProps {
   initialData?: Book;
   onSubmit: (data: z.infer<typeof bookSchema>) => Promise<void>;
   isLoading: boolean;
+  formId: string;
 }
 
-export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
+export function BookForm({ initialData, onSubmit, isLoading, formId }: BookFormProps) {
   const { toast } = useToast();
   const [isAiLoading, setIsAiLoading] = useState(false);
   const form = useForm<z.infer<typeof bookSchema>>({
@@ -122,7 +122,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form id={formId} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -131,7 +131,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormItem>
                 <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Book Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter title" {...field} className="glass h-11" />
+                  <Input placeholder="Enter title" {...field} className="glass h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -144,7 +144,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormItem>
                 <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Author</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter author" {...field} className="glass h-11" />
+                  <Input placeholder="Enter author" {...field} className="glass h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -157,7 +157,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormItem>
                 <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Genre</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. Science Fiction" {...field} className="glass h-11" />
+                  <Input placeholder="e.g. Science Fiction" {...field} className="glass h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -170,7 +170,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormItem>
                 <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Book ID Number</FormLabel>
                 <FormControl>
-                  <Input placeholder="e.g. BKN-1020" {...field} className="glass h-11" />
+                  <Input placeholder="e.g. BKN-1020" {...field} className="glass h-10" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -183,13 +183,13 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <div className="flex justify-between items-end mb-2">
+              <div className="flex justify-between items-end mb-1">
                 <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Description</FormLabel>
                 <Button 
                   type="button" 
                   variant="outline" 
                   size="sm" 
-                  className="h-7 gap-2 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 rounded-full text-[10px]"
+                  className="h-6 gap-2 bg-primary/10 border-primary/20 text-primary hover:bg-primary/20 rounded-full text-[9px]"
                   onClick={handleAiCurate}
                   disabled={isAiLoading}
                 >
@@ -200,7 +200,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormControl>
                 <Textarea 
                   placeholder="Professional book summary..." 
-                  className="min-h-[100px] glass resize-none" 
+                  className="min-h-[80px] glass resize-none" 
                   {...field} 
                 />
               </FormControl>
@@ -217,7 +217,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
               <FormLabel className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">Availability Status</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
-                  <SelectTrigger className="glass h-11">
+                  <SelectTrigger className="glass h-10">
                     <SelectValue placeholder="Select status" />
                   </SelectTrigger>
                 </FormControl>
@@ -233,20 +233,20 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
         />
 
         {status === 'BORROWED' && (
-          <div className="space-y-4 p-5 bg-primary/5 border border-primary/20 rounded-2xl animate-in-fade">
-            <div className="flex items-center gap-2 mb-2">
-              <User className="w-4 h-4 text-primary" />
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary">Borrower Registry Data</h3>
+          <div className="space-y-4 p-4 bg-primary/5 border border-primary/20 rounded-2xl animate-in-fade">
+            <div className="flex items-center gap-2 mb-1">
+              <User className="w-3.5 h-3.5 text-primary" />
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-primary">Borrower Metadata</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="borrowerName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Student Name</FormLabel>
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Full student name" {...field} className="glass h-10" />
+                      <Input placeholder="Student name" {...field} className="glass h-9 text-xs" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -259,7 +259,7 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
                   <FormItem>
                     <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Student USN</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. 1MS21CS001" {...field} className="glass h-10 font-mono" />
+                      <Input placeholder="e.g. 1MS21CS001" {...field} className="glass h-9 text-xs font-mono" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -270,9 +270,9 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
                 name="borrowerAge"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Student Age</FormLabel>
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Age</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} className="glass h-10" />
+                      <Input type="number" {...field} className="glass h-9 text-xs" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -283,9 +283,9 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
                 name="borrowerBranch"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Academic Branch</FormLabel>
+                    <FormLabel className="text-[9px] uppercase font-bold text-muted-foreground">Branch</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Computer Science" {...field} className="glass h-10" />
+                      <Input placeholder="Academic branch" {...field} className="glass h-9 text-xs" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -294,17 +294,6 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
             </div>
           </div>
         )}
-
-        <div className="pt-6 pb-4">
-          <Button 
-            type="submit" 
-            className="w-full h-12 text-lg shadow-xl shadow-primary/20 font-bold rounded-xl" 
-            disabled={isLoading}
-          >
-            {isLoading && <Loader2 className="mr-2 h-5 w-5 animate-spin" />}
-            {initialData ? 'Synchronize Record' : 'Commit to Index'}
-          </Button>
-        </div>
       </form>
     </Form>
   );

@@ -9,11 +9,12 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogDescription 
+  DialogDescription,
+  DialogFooter
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Plus, BookOpenCheck, Bookmark, Library, Loader2 } from 'lucide-react';
+import { Plus, BookOpenCheck, Bookmark, Library, Loader2, Save } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { 
   createBook, 
@@ -38,6 +39,8 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
   const [editingBook, setEditingBook] = useState<Book | undefined>();
   const [viewingBook, setViewingBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const FORM_ID = 'book-entry-form';
 
   const handleAdd = () => {
     setEditingBook(undefined);
@@ -73,8 +76,8 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
       }
       setIsFormOpen(false);
       router.refresh();
-    } catch (e) {
-      toast({ title: 'Operation Failed', description: 'Unauthorized or validation error.', variant: 'destructive' });
+    } catch (e: any) {
+      toast({ title: 'Operation Failed', description: e.message || 'Validation error.', variant: 'destructive' });
     } finally {
       setIsLoading(false);
     }
@@ -176,8 +179,8 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
       </div>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="glass border-white/10 sm:max-w-[650px] text-slate-100 p-0 overflow-hidden flex flex-col max-h-[90vh]">
-          <DialogHeader className="p-6 pb-0">
+        <DialogContent className="glass border-white/10 sm:max-w-[650px] text-slate-100 p-0 overflow-hidden flex flex-col h-[90vh]">
+          <DialogHeader className="p-6 pb-4 border-b border-white/5 shrink-0">
             <DialogTitle className="text-2xl font-headline text-white">
               {editingBook ? 'Refine Entry' : 'New Archive Entry'}
             </DialogTitle>
@@ -185,15 +188,29 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               {editingBook ? 'Update the metadata for this catalog object.' : 'Initialize a new entry in the BenakaLib central repository.'}
             </DialogDescription>
           </DialogHeader>
-          <ScrollArea className="flex-1 p-6">
-            <div className="pb-4">
+          
+          <ScrollArea className="flex-1">
+            <div className="p-6 pb-12">
               <BookForm 
                 initialData={editingBook} 
                 onSubmit={handleSubmit}
                 isLoading={isLoading}
+                formId={FORM_ID}
               />
             </div>
           </ScrollArea>
+
+          <DialogFooter className="p-4 border-t border-white/5 bg-background/50 backdrop-blur-md shrink-0">
+            <Button 
+              type="submit" 
+              form={FORM_ID}
+              className="w-full h-12 text-lg shadow-xl shadow-primary/20 font-bold rounded-xl gap-2" 
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+              {editingBook ? 'Synchronize Record' : 'Commit to Index'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
