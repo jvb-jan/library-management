@@ -23,7 +23,7 @@ import {
   SelectTrigger, 
   SelectValue 
 } from '@/components/ui/select';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, User, GraduationCap, IdCard } from 'lucide-react';
 import { generateBookDescriptionSummary } from '@/ai/flows/generate-book-description-summary-flow';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +34,19 @@ const bookSchema = z.object({
   description: z.string().min(10, 'Description should be longer'),
   bookIdNumber: z.string().min(1, 'Book ID Number is required'),
   availabilityStatus: z.enum(['AVAILABLE', 'BORROWED', 'OUT_OF_STOCK']),
+  // Borrower details (required only if status is BORROWED)
+  borrowerName: z.string().optional(),
+  borrowerAge: z.coerce.number().optional(),
+  borrowerBranch: z.string().optional(),
+  borrowerUsn: z.string().optional(),
+}).refine((data) => {
+  if (data.availabilityStatus === 'BORROWED') {
+    return !!data.borrowerName && !!data.borrowerUsn && !!data.borrowerBranch && !!data.borrowerAge;
+  }
+  return true;
+}, {
+  message: "Borrower details (Name, USN, Age, Branch) are mandatory when status is BORROWED",
+  path: ["borrowerName"]
 });
 
 interface BookFormProps {
@@ -54,6 +67,10 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
       description: initialData.description,
       bookIdNumber: initialData.bookIdNumber,
       availabilityStatus: initialData.availabilityStatus,
+      borrowerName: initialData.borrowerName || '',
+      borrowerAge: initialData.borrowerAge || 20,
+      borrowerBranch: initialData.borrowerBranch || '',
+      borrowerUsn: initialData.borrowerUsn || '',
     } : {
       title: '',
       author: '',
@@ -61,8 +78,14 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
       description: '',
       bookIdNumber: '',
       availabilityStatus: 'AVAILABLE',
+      borrowerName: '',
+      borrowerAge: 20,
+      borrowerBranch: '',
+      borrowerUsn: '',
     },
   });
+
+  const status = form.watch('availabilityStatus');
 
   const handleAiCurate = async () => {
     const title = form.getValues('title');
@@ -208,6 +231,69 @@ export function BookForm({ initialData, onSubmit, isLoading }: BookFormProps) {
             </FormItem>
           )}
         />
+
+        {status === 'BORROWED' && (
+          <div className="space-y-4 p-6 bg-primary/5 border border-primary/20 rounded-2xl animate-in-fade">
+            <div className="flex items-center gap-2 mb-2">
+              <User className="w-4 h-4 text-primary" />
+              <h3 className="text-sm font-bold uppercase tracking-widest text-primary">Borrower Details</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="borrowerName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter student name" {...field} className="glass" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="borrowerUsn"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>USN (Student ID)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. 1MS21CS001" {...field} className="glass font-mono" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="borrowerAge"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Age</FormLabel>
+                    <FormControl>
+                      <Input type="number" {...field} className="glass" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="borrowerBranch"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Branch</FormLabel>
+                    <FormControl>
+                      <Input placeholder="e.g. Computer Science" {...field} className="glass" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+        )}
 
         <Button type="submit" className="w-full h-12 text-lg shadow-lg shadow-primary/20" disabled={isLoading}>
           {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -25,6 +25,11 @@ export interface Book {
   bookIdNumber: string;
   availabilityStatus: AvailabilityStatus;
   createdAt: string;
+  // Borrower info (populated when status is BORROWED)
+  borrowerName?: string;
+  borrowerAge?: number;
+  borrowerBranch?: string;
+  borrowerUsn?: string;
 }
 
 export interface ActivityLog {

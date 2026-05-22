@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen, Bookmark } from 'lucide-react';
+import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Dialog, 
@@ -71,9 +71,9 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
         <Table>
           <TableHeader className="bg-muted/30">
             <TableRow className="border-b border-white/5 hover:bg-transparent">
-              <TableHead>Identity</TableHead>
-              <TableHead>Academic Info</TableHead>
-              <TableHead>Active Borrowing</TableHead>
+              <TableHead>Identity (Name & USN)</TableHead>
+              <TableHead>Academic Info (Branch & Age)</TableHead>
+              <TableHead>Books Borrowed</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
