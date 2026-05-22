@@ -15,7 +15,6 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { InventoryChartWrapper } from '@/components/dashboard/InventoryChartWrapper';
 import { Badge } from '@/components/ui/badge';
-import { SystemHealth } from '@/components/dashboard/SystemHealth';
 
 interface AdminDashboardProps {
   user: User;
@@ -60,8 +59,8 @@ export function AdminDashboard({ user, stats }: AdminDashboardProps) {
         <StatCard label="Borrowed" value={stats.borrowedBooks} icon={Clock} colorClass="text-amber-400" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <Card className="glass-card lg:col-span-8 border-white/5">
+      <div className="grid grid-cols-1 gap-8">
+        <Card className="glass-card border-white/5">
           <CardHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
               <CardTitle className="flex items-center gap-2 text-xl">
@@ -78,10 +77,6 @@ export function AdminDashboard({ user, stats }: AdminDashboardProps) {
             <InventoryChartWrapper data={chartData} />
           </CardContent>
         </Card>
-
-        <div className="lg:col-span-4 h-full">
-          <SystemHealth />
-        </div>
       </div>
     </div>
   );
