@@ -96,8 +96,8 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <Card className="glass-card lg:col-span-2 border-white/5">
+      <div className="grid grid-cols-1 gap-8">
+        <Card className="glass-card border-white/5">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="text-xl">Inventory Status</CardTitle>
@@ -127,36 +127,6 @@ export function LibrarianDashboard({ user, stats, logs }: LibrarianDashboardProp
                   <Badge variant="outline" className="text-[10px] uppercase tracking-widest">Update</Badge>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="glass-card border-white/5 h-fit">
-          <CardHeader>
-            <CardTitle className="text-xl">Quick Insights</CardTitle>
-            <CardDescription>Operational telemetry overview.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              <div className="flex-1">
-                <p className="text-xs font-bold text-slate-200">System Latency: Low</p>
-                <p className="text-[10px] text-muted-foreground">Optimal sync with central archive.</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-              <div className="flex-1">
-                <p className="text-xs font-bold text-slate-200">Catalog Health: Excellent</p>
-                <p className="text-[10px] text-muted-foreground">No metadata corruption detected.</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-secondary" />
-              <div className="flex-1">
-                <p className="text-xs font-bold text-slate-200">Role: Librarian</p>
-                <p className="text-[10px] text-muted-foreground">Update permissions authorized.</p>
-              </div>
             </div>
           </CardContent>
         </Card>
