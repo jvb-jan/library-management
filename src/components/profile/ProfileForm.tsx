@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -35,6 +35,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -57,7 +58,9 @@ export function ProfileForm({ user }: ProfileFormProps) {
         title: 'Profile Updated',
         description: 'Your account metadata has been successfully synchronized.',
       });
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (error) {
       toast({
         title: 'Update Failed',
@@ -108,7 +111,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Full Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Arjun Mehta" {...field} className="glass h-12 rounded-xl" />
+                      <Input placeholder="Arjun Mehta" {...field} className="glass h-12 rounded-xl" disabled={isLoading || isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -121,7 +124,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                   <FormItem>
                     <FormLabel className="text-xs uppercase tracking-widest font-bold text-muted-foreground">Age</FormLabel>
                     <FormControl>
-                      <Input type="number" {...field} className="glass h-12 rounded-xl" />
+                      <Input type="number" {...field} className="glass h-12 rounded-xl" disabled={isLoading || isPending} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -139,7 +142,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                           <GraduationCap className="w-3 h-3" /> Academic Branch
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Computer Science" {...field} className="glass h-12 rounded-xl" />
+                          <Input placeholder="Computer Science" {...field} className="glass h-12 rounded-xl" disabled={isLoading || isPending} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -152,7 +155,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                       <FormItem>
                         <FormLabel className="text-xs uppercase tracking-widest font-bold text-muted-foreground">USN (Student ID)</FormLabel>
                         <FormControl>
-                          <Input placeholder="1MS21CS001" {...field} className="glass h-12 rounded-xl font-mono" />
+                          <Input placeholder="1MS21CS001" {...field} className="glass h-12 rounded-xl font-mono" disabled={isLoading || isPending} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -169,7 +172,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                         <Phone className="w-3 h-3" /> Contact Number
                       </FormLabel>
                       <FormControl>
-                        <Input placeholder="+91 98450 12345" {...field} className="glass h-12 rounded-xl" />
+                        <Input placeholder="+91 98450 12345" {...field} className="glass h-12 rounded-xl" disabled={isLoading || isPending} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -179,8 +182,8 @@ export function ProfileForm({ user }: ProfileFormProps) {
             </div>
 
             <div className="pt-4">
-              <Button type="submit" className="w-full h-12 rounded-xl shadow-lg shadow-primary/20 gap-2 font-bold" disabled={isLoading}>
-                {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <Button type="submit" className="w-full h-12 rounded-xl shadow-lg shadow-primary/20 gap-2 font-bold" disabled={isLoading || isPending}>
+                {isLoading || isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 Synchronize Account Details
               </Button>
             </div>

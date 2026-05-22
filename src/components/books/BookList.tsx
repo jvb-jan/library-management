@@ -33,7 +33,8 @@ import {
   BookMarked,
   Bookmark,
   BookmarkCheck,
-  Eye
+  Eye,
+  Loader2
 } from 'lucide-react';
 import { hasPermission } from '@/lib/auth';
 import { cn } from '@/lib/utils';
@@ -45,7 +46,7 @@ interface BookListProps {
   onEdit: (book: Book) => void;
   onDelete: (id: string) => void;
   onViewDetails: (book: Book) => void;
-  onToggleToRead?: (id: string) => void;
+  onToggleToRead?: (id: string) => Promise<void>;
 }
 
 export function BookList({ 
@@ -59,6 +60,7 @@ export function BookList({
 }: BookListProps) {
   const [search, setSearch] = useState('');
   const [genreFilter, setGenreFilter] = useState('ALL');
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const genres = useMemo(() => {
     const s = new Set(books.map(b => b.genre));
@@ -87,6 +89,16 @@ export function BookList({
         return <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30">Borrowed</Badge>;
       case 'OUT_OF_STOCK':
         return <Badge className="bg-rose-500/20 text-rose-500 border-rose-500/30">Out of Stock</Badge>;
+    }
+  };
+
+  const handleToggle = async (id: string) => {
+    if (!onToggleToRead) return;
+    setTogglingId(id);
+    try {
+      await onToggleToRead(id);
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -138,6 +150,7 @@ export function BookList({
             ) : (
               filteredBooks.map((book) => {
                 const isInReadingList = readingList.includes(book.id);
+                const isToggling = togglingId === book.id;
                 return (
                   <TableRow key={book.id} className="border-b border-white/5 group hover:bg-white/5">
                     <TableCell>
@@ -172,10 +185,17 @@ export function BookList({
                               "rounded-full h-8 w-8",
                               isInReadingList ? "text-secondary bg-secondary/10" : "text-muted-foreground hover:text-secondary hover:bg-secondary/10"
                             )}
-                            onClick={() => onToggleToRead(book.id)}
+                            disabled={isToggling}
+                            onClick={() => handleToggle(book.id)}
                             title={isInReadingList ? "Remove from List" : "Add to Reading List"}
                           >
-                            {isInReadingList ? <BookmarkCheck className="w-4 h-4" /> : <Bookmark className="w-4 h-4" />}
+                            {isToggling ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : isInReadingList ? (
+                              <BookmarkCheck className="w-4 h-4" />
+                            ) : (
+                              <Bookmark className="w-4 h-4" />
+                            )}
                           </Button>
                         )}
                         <DropdownMenu>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { User, Role, Book } from '@/lib/types';
 import { 
   Table, 
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen } from 'lucide-react';
+import { Edit, User as UserIcon, GraduationCap, IdCard, BookOpen, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Dialog, 
@@ -36,6 +36,7 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -51,7 +52,9 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
       await updateUserAction(editingUser.id, data);
       toast({ title: 'Profile Synchronized', description: 'Borrower details updated in the registry.' });
       setIsFormOpen(false);
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (e) {
       toast({ title: 'Update Failed', description: 'System error encountered.', variant: 'destructive' });
     } finally {
@@ -67,6 +70,9 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
 
   return (
     <div className="space-y-6">
+      <div className="flex items-center gap-2 mb-2 px-1">
+        {(isLoading || isPending) && <Loader2 className="w-4 h-4 animate-spin text-primary" />}
+      </div>
       <div className="glass-card rounded-2xl overflow-hidden border-white/5">
         <Table>
           <TableHeader className="bg-muted/30">
@@ -125,6 +131,7 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
                     size="icon" 
                     className="rounded-xl hover:bg-white/5 transition-all"
                     onClick={() => handleEdit(u)}
+                    disabled={isLoading || isPending}
                     title="Edit Borrower Profile"
                   >
                     <Edit className="w-4 h-4" />
@@ -136,7 +143,7 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
         </Table>
       </div>
 
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={(val) => !isLoading && !isPending && setIsFormOpen(val)}>
         <DialogContent className="glass border-white/10 sm:max-w-[500px] text-slate-100">
           <DialogHeader>
             <DialogTitle className="text-2xl font-headline text-white">Manage Borrower Details</DialogTitle>
@@ -146,7 +153,7 @@ export function UsersManager({ users, books, currentUserRole }: UsersManagerProp
             <UserForm 
               initialData={editingUser || undefined} 
               onSubmit={handleSubmit}
-              isLoading={isLoading}
+              isLoading={isLoading || isPending}
             />
           </div>
         </DialogContent>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { BookList } from '@/components/books/BookList';
 import { BookForm } from '@/components/books/BookForm';
 import { BookDetailsDialog } from '@/components/books/BookDetailsDialog';
@@ -39,6 +39,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
   const [editingBook, setEditingBook] = useState<Book | undefined>();
   const [viewingBook, setViewingBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const FORM_ID = 'book-entry-form';
 
@@ -54,12 +55,17 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
 
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this nexus entry?')) {
+      setIsLoading(true);
       try {
         await deleteBook(id);
         toast({ title: 'Record Purged', description: 'The entry has been removed from the central archive.' });
-        router.refresh();
+        startTransition(() => {
+          router.refresh();
+        });
       } catch (e) {
         toast({ title: 'Purge Failed', description: 'Unauthorized or system error encountered.', variant: 'destructive' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -75,7 +81,9 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
         toast({ title: 'Index Entry Created', description: 'New book added to the repository.' });
       }
       setIsFormOpen(false);
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (e: any) {
       toast({ title: 'Operation Failed', description: e.message || 'Validation error.', variant: 'destructive' });
     } finally {
@@ -90,7 +98,9 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
         title: result.isInList ? 'Nexus Linked' : 'Link Severed',
         description: result.isInList ? 'Added to your reading list.' : 'Removed from your reading list.'
       });
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (e) {
       toast({ title: 'Link Failed', description: 'Could not update your personal list.', variant: 'destructive' });
     }
@@ -118,6 +128,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
           <div className="flex items-center gap-2 mb-2 px-2">
             <Library className="w-4 h-4 text-primary" />
             <h2 className="text-sm font-bold uppercase tracking-widest text-primary">Nexus Catalog</h2>
+            {(isLoading || isPending) && <Loader2 className="w-3 h-3 animate-spin text-muted-foreground" />}
           </div>
           <BookList 
             books={initialBooks} 
@@ -178,7 +189,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
         )}
       </div>
 
-      <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
+      <Dialog open={isFormOpen} onOpenChange={(val) => !isLoading && !isPending && setIsFormOpen(val)}>
         <DialogContent className="glass border-white/10 sm:max-w-[650px] text-slate-100 p-0 overflow-hidden flex flex-col h-[90vh]">
           <DialogHeader className="p-6 pb-4 border-b border-white/5 shrink-0">
             <DialogTitle className="text-2xl font-headline text-white">
@@ -194,7 +205,7 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               <BookForm 
                 initialData={editingBook} 
                 onSubmit={handleSubmit}
-                isLoading={isLoading}
+                isLoading={isLoading || isPending}
                 formId={FORM_ID}
               />
             </div>
@@ -205,9 +216,9 @@ export function BookManager({ initialBooks, user, initialAction }: BookManagerPr
               type="submit" 
               form={FORM_ID}
               className="w-full h-12 text-lg shadow-xl shadow-primary/20 font-bold rounded-xl gap-2" 
-              disabled={isLoading}
+              disabled={isLoading || isPending}
             >
-              {isLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
+              {isLoading || isPending ? <Loader2 className="h-5 w-5 animate-spin" /> : <Save className="h-5 w-5" />}
               {editingBook ? 'Synchronize Record' : 'Commit to Index'}
             </Button>
           </DialogFooter>
