@@ -1,9 +1,8 @@
 'use server';
 
 import { getSession } from './auth';
-import { updateUser, addLog } from '@/lib/store';
+import { updateUser as updateStoreUser, addLog } from '@/lib/store';
 import { revalidatePath } from 'next/cache';
-import { Role } from '@/lib/types';
 
 export async function updateUserRecord(id: string, data: any) {
   const session = await getSession();
@@ -11,7 +10,7 @@ export async function updateUserRecord(id: string, data: any) {
     throw new Error('Unauthorized');
   }
 
-  updateUser(id, data);
+  updateStoreUser(id, data);
   
   addLog({
     userId: session.id,
