@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, User as UserIcon, GraduationCap, IdentificationCard } from 'lucide-react';
+import { Edit, User as UserIcon, GraduationCap, IdCard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { 
   Dialog, 
@@ -91,7 +91,7 @@ export function UsersManager({ users, currentUserRole }: UsersManagerProps) {
                       {u.branch || 'Undesignated Branch'}
                     </div>
                     <div className="text-[10px] text-muted-foreground flex items-center gap-2">
-                      <IdentificationCard className="w-3 h-3" />
+                      <IdCard className="w-3 h-3" />
                       Age: {u.age || 'N/A'}
                     </div>
                   </div>
