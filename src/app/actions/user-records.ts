@@ -5,12 +5,12 @@ import { updateUser as updateStore, addLog } from '@/lib/store';
 import { revalidatePath } from 'next/cache';
 
 /**
- * Updates a borrower's record. This is accessible to both Admins and Librarians.
- * Renamed internal import to 'updateStore' to avoid naming collision with the exported action.
+ * Updates a borrower's record. This is now restricted to Admins for the standalone module.
+ * Librarians still perform syncs via the books.ts actions.
  */
 export async function updateUser(id: string, data: any) {
   const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'LIBRARIAN')) {
+  if (!session || session.role !== 'ADMIN') {
     throw new Error('Unauthorized');
   }
 

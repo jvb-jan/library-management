@@ -42,7 +42,6 @@ export function Sidebar({ user }: SidebarProps) {
     if (user.role === 'LIBRARIAN') {
       return [
         ...base,
-        { label: 'User Records', icon: Users, href: '/dashboard/users' },
         { label: 'Updates', icon: BarChart3, href: '/dashboard/activity' },
       ];
     }

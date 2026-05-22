@@ -5,7 +5,8 @@ import { UsersManager } from '@/components/users/UsersManager';
 
 export default async function UsersPage() {
   const session = await getSession();
-  if (!session || (session.role !== 'ADMIN' && session.role !== 'LIBRARIAN')) {
+  // Restrict standalone registry management to ADMIN only
+  if (!session || session.role !== 'ADMIN') {
     redirect('/dashboard');
   }
 
